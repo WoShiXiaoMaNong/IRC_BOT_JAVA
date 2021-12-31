@@ -1,6 +1,7 @@
 package zm.irc;
 
 import zm.irc.client.IrcClient;
+import zm.irc.dao.DbConnectionPool;
 import zm.irc.message.send.IrcSendMessage;
 
 import java.io.*;
@@ -13,6 +14,7 @@ public class Irc {
     public static void main(String[] args) throws IOException, InterruptedException {
         dbUserName = args[0];
         dbPwd = args[1];
+        DbConnectionPool.close(DbConnectionPool.getConnection());
         String server = "irc.libera.chat";
         String nick = "B_FD2";
         String login = "anyName";
