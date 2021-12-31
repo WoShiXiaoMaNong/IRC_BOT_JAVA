@@ -7,26 +7,19 @@ import java.io.*;
 
 public class Irc {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static String dbUserName="";
+    public static String dbPwd="";
 
+    public static void main(String[] args) throws IOException, InterruptedException {
+        dbUserName = args[0];
+        dbPwd = args[1];
         String server = "irc.libera.chat";
-        String nick = "BFD_CHAT_LOGGER_test";
+        String nick = "B_FD2";
         String login = "anyName";
         String channel = "#0dev";
 
-        IrcClient client = new IrcClient(server,IrcClient.DEFAULT_PORT,nick);
+        IrcClient client = new IrcClient(server,IrcClient.DEFAULT_PORT,nick,channel);
         client.start();
-        client.logon(nick);
-      //  Thread.sleep(3000);
-      //  client.join(channel);
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        while(true){
-
-            String msgStr = br.readLine();
-            IrcSendMessage msg = IrcSendMessage.build(channel,msgStr);
-            client.sendMessage(msg);
-        }
-
     }
 
 

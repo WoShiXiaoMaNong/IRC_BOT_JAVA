@@ -78,4 +78,14 @@ public class IrcReceiveChatMessage extends IrcReceiveMessage{
     public String getMessageForPrint() {
         return this.getFromName() + " \t-> " + this.getMessageBody();
     }
+
+    @Override
+    public String toString() {
+        return "IrcReceiveChatMessage{" +
+                "channel='" + channel + '\'' +
+                ", fromName='" + fromName + '\'' +
+                ", fromIp='" + fromIp + '\'' +
+                ", messageBody='" + messageBody + '\'' +
+                '}';
+    }
 }
