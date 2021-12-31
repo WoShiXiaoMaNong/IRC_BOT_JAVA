@@ -7,7 +7,7 @@ import java.sql.*;
 public class DbConnectionPool {
 
     private static final String driverName = "com.mysql.jdbc.Driver";
-    private static final String dbUrl = "jdbc:mysql://z-lang.top:3306/irc&userSSL=false";
+    private static final String dbUrl = "jdbc:mysql://z-lang.top:3306/irc&useSSL=false";
 
 
 
