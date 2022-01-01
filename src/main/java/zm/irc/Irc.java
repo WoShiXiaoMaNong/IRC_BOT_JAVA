@@ -25,9 +25,8 @@ public class Irc {
         List<String> channel = new ArrayList<>();
         channel.add("#linuxba");
         channel.add("#0dev");
-        channel.add("#zmtest");
         channel.add("#c_lang_cn");
-        //channel.add("#linux");
+        channel.add("#linux");
 
         IrcClient client = new IrcClient(server,IrcClient.DEFAULT_PORT,nick,channel);
         client.start();
