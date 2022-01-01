@@ -26,7 +26,7 @@ public class CommandLineInputThread implements Runnable{
             while (true) {
 
                 String msgStr = br.readLine();
-                IrcSendMessage msg = IrcSendMessage.build(ircClient.getChannel(), msgStr);
+                IrcSendMessage msg = IrcSendMessage.build(ircClient.getCurrentChannel(), msgStr);
                 this.ircClient.sendMessage(msg);
             }
         }catch (Exception e){

@@ -16,8 +16,11 @@ public class DbLogProcessor implements IrcMessageProcessor{
     @Override
     public boolean processor(IrcClient client, IrcReceiveMessage receivedMsg) {
 
-
-        this.messageDao.saveMessage(receivedMsg);
+        if(receivedMsg instanceof  IrcReceiveChatMessage) {
+            this.messageDao.saveMessage((IrcReceiveChatMessage)receivedMsg);
+        }else{
+            //TBD
+        }
 
         return true;
     }

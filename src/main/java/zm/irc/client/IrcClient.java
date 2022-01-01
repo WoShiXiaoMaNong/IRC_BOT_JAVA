@@ -11,6 +11,8 @@ import zm.irc.threads.RecvMsgProcessThread;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
+import java.util.Set;
 
 
 public class IrcClient {
@@ -22,7 +24,9 @@ public class IrcClient {
 
     private String nick;
 
-    private String channel;
+    private List<String> channel;
+
+    private int currentChannelIndex;
 
     private BufferedWriter writer;
     private  BufferedReader reader;
@@ -33,7 +37,7 @@ public class IrcClient {
 
     private RecvMsgProcessThread recvMsgProcessThread;
 
-    public IrcClient(String server,int port,String nick,String channel){
+    public IrcClient(String server, int port, String nick, List<String> channel){
         this.server = server;
         this.port = port;
         this.nick = nick;
@@ -41,6 +45,7 @@ public class IrcClient {
 
         this.recvMsgProcessThread = new RecvMsgProcessThread(this);
         this.channel = channel;
+        this.currentChannelIndex = 0;
     }
 
     public void logon(String nick){
@@ -49,14 +54,23 @@ public class IrcClient {
         this.sendMessage(logonMsg);
     }
 
-    public void join(String channel){
+    /**
+     * 加入指定频道
+     * @param channel
+     */
+    private void join(String channel){
+        log.info("加入频道："  + channel);
         IrcJoinMessage joinMsg = new IrcJoinMessage();
         joinMsg.setChannel(channel);
         this.sendMessage(joinMsg);
     }
 
-    public void identify(String pwd){
-
+    /**
+     * 用于认证昵称，暂时未启用
+     * @param pwd
+     */
+    public void identify(String pwd) {
+        throw new RuntimeException("TBD");
     }
 
 
@@ -81,7 +95,10 @@ public class IrcClient {
             log.info("使用昵称:" + nick + " 登录频道：" + this.channel);
             this.logon(nick);
             Thread.sleep(3000);
-            join(channel);
+            this.channel.forEach(c->{
+                join(c);
+            });
+
 
         }catch (Exception e){
             e.printStackTrace();
@@ -89,23 +106,54 @@ public class IrcClient {
 
     }
 
-
+    /**
+     * 读取消息
+     * @return
+     * @throws IOException
+     */
     public String readNewMsgLine() throws IOException {
         return this.reader.readLine();
     }
 
-    public void sendMessageDirect(IrcSendMessage msg) throws IOException {
+    /**
+     * 直接将消息发送出去，跳过发送等待队列
+     * @param msg
+     * @throws IOException
+     */
+    public synchronized void sendMessageDirect(IrcSendMessage msg) throws IOException {
         writer.write(msg.getMessage());
         writer.flush();
     }
 
-
+    /**
+     * 将消息添加到发送队列的末尾。
+     * 实际发送时间，根据{@link MsgSendThread}工作情况而定。
+     * @param msg
+     */
     public void sendMessage(IrcSendMessage msg) {
         this.msgSendThread.sendMessage(msg);
     }
 
-    public String getChannel(){
+    public List<String> getChannel(){
         return this.channel;
+    }
+    public String getCurrentChannel(){
+        return this.channel.get(this.currentChannelIndex);
+    }
+
+    /**
+     * 用于切换当前频道
+     * @param index
+     */
+    public void changeChannel(int index){
+        if(index < 0 ){
+            index = 0;
+        }
+        if(index >= this.channel.size()){
+            index = this.channel.size() - 1;
+        }
+
+        this.currentChannelIndex = index;
     }
 
 }
