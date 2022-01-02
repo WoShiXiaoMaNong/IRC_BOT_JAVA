@@ -13,8 +13,8 @@ public class DbConnectionPool {
     private static final String driverName = "com.mysql.cj.jdbc.Driver";
     private static final String dbUrl = "jdbc:mysql://z-lang.top:3306/irc?useSSL=false";
 
-    private static ConcurrentLinkedQueue<Connection> freeConn = new ConcurrentLinkedQueue<>();
-    private static ConcurrentHashMap<Integer,Connection> inUsedConn = new ConcurrentHashMap<>();
+    private static final ConcurrentLinkedQueue<Connection> freeConn = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentHashMap<Integer,Connection> inUsedConn = new ConcurrentHashMap<>();
 
     public static void init(int poolSize) {
         log.info("INIT : DB Conn pool. Size is :" + poolSize);
@@ -42,7 +42,7 @@ public class DbConnectionPool {
                 }
             });
         }
-       if(inUsedConn != null && !inUsedConn.isEmpty()){
+       if( !inUsedConn.isEmpty()){
            inUsedConn.forEach((key,value)-> {
                try {
                    value.close();
@@ -64,7 +64,9 @@ public class DbConnectionPool {
 
     public static Connection getConnection(){
        Connection conn = freeConn.poll();
-       inUsedConn.put(conn.hashCode(),conn);
+       if(conn != null) {
+           inUsedConn.put(conn.hashCode(), conn);
+       }
        return conn;
     }
 
