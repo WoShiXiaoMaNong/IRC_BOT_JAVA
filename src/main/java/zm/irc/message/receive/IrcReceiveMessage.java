@@ -3,8 +3,9 @@ package zm.irc.message.receive;
 import org.apache.log4j.Logger;
 
 public abstract class IrcReceiveMessage {
-    private static final Logger log = Logger.getLogger(IrcReceiveMessage.class)
-;
+    private static final Logger log = Logger.getLogger(IrcReceiveMessage.class);
+
+
     public static IrcReceiveMessage build(String msgStr){
 
         if(msgStr.startsWith("PING")){

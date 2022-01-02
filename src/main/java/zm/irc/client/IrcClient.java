@@ -2,16 +2,17 @@ package zm.irc.client;
 
 
 import org.apache.log4j.Logger;
-import zm.irc.message.receive.IrcReceiveMessage;
-import zm.irc.message.processor.MessageProcessorCenter;
 import zm.irc.message.send.IrcJoinMessage;
 import zm.irc.message.send.IrcLogonAnyNameMessage;
 import zm.irc.message.send.IrcSendMessage;
+import zm.irc.threads.CommandLineInputThread;
+import zm.irc.threads.MsgSendThread;
+import zm.irc.threads.RecvMsgProcessThread;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
+import java.util.List;
+import java.util.Set;
 
 
 public class IrcClient {
@@ -20,17 +21,31 @@ public class IrcClient {
     public static final int DEFAULT_PORT = 6667;
     private String server;
     private int port;
-    private ConcurrentLinkedQueue<IrcSendMessage> messagePendingSend;
+
     private String nick;
 
-    private MessageProcessorCenter msgProcessorCenter;
+    private List<String> channel;
 
-    public IrcClient(String server,int port,String nick){
+    private int currentChannelIndex;
+
+    private BufferedWriter writer;
+    private  BufferedReader reader;
+
+
+
+    private MsgSendThread msgSendThread;
+
+    private RecvMsgProcessThread recvMsgProcessThread;
+
+    public IrcClient(String server, int port, String nick, List<String> channel){
         this.server = server;
         this.port = port;
         this.nick = nick;
-        this.messagePendingSend = new ConcurrentLinkedQueue();
-        this.msgProcessorCenter = MessageProcessorCenter.build(this);
+        this.msgSendThread = new MsgSendThread(this);
+
+        this.recvMsgProcessThread = new RecvMsgProcessThread(this);
+        this.channel = channel;
+        this.currentChannelIndex = 0;
     }
 
     public void logon(String nick){
@@ -39,69 +54,106 @@ public class IrcClient {
         this.sendMessage(logonMsg);
     }
 
-    public void join(String channel){
+    /**
+     * 加入指定频道
+     * @param channel
+     */
+    private void join(String channel){
+        log.info("加入频道："  + channel);
         IrcJoinMessage joinMsg = new IrcJoinMessage();
         joinMsg.setChannel(channel);
         this.sendMessage(joinMsg);
     }
 
-    public void identify(String pwd){
-
+    /**
+     * 用于认证昵称，暂时未启用
+     * @param pwd
+     */
+    public void identify(String pwd) {
+        throw new RuntimeException("TBD");
     }
 
-    public void sendMessage(IrcSendMessage msg){
-        if(msg == null){
-            return ;
-        }
-        this.messagePendingSend.add(msg);
-    }
+
     public void start() throws IOException {
         log.info(String.format("Start to connect IRC server(Server:%s, Port:%s)",this.server,this.port));
 
         Socket socket = new Socket(this.server, this.port);
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        new Thread(() -> {
-            try{
-                log.info("Listener Thread started.");
-                String msg = reader.readLine();
-                while(msg != null){
-                    onMessage(msg);
-                    msg = reader.readLine();
-                }
-            }catch (Exception e){
-                log.error("error",e);
-            }
-        }).start();
+        log.info("Prepare Message Recv Thread!");
+        new Thread(new RecvMsgProcessThread(this)).start();
 
-        new Thread(() -> {
+        log.info("Prepare Message Sender Thread!");
+        new Thread(this.msgSendThread).start();
 
-                log.info("Sender Thread started.");
-                IrcSendMessage msg = messagePendingSend.poll();
-                while(true){
-                    try{
-                        if(msg == null){
-                            msg = messagePendingSend.poll();
-                            continue;
-                        }
-                        sendMessage(writer,msg);
-                        msg = messagePendingSend.poll();
-                    }catch (Exception e){
-                        log.error("error",e);
-                    }
-                }
+        log.info("准备消息输入线程！");
+        new Thread(new CommandLineInputThread(this)).start();
 
-        }).start();
+
+        try {
+            log.info("使用昵称:" + nick + " 登录频道：" + this.channel);
+            this.logon(nick);
+            Thread.sleep(3000);
+            this.channel.forEach(c->{
+                join(c);
+            });
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
-    private void onMessage(String message){
-        IrcReceiveMessage receivedMsg = IrcReceiveMessage.build(message);
-        this.msgProcessorCenter.process(receivedMsg);
+    /**
+     * 读取消息
+     * @return
+     * @throws IOException
+     */
+    public String readNewMsgLine() throws IOException {
+        return this.reader.readLine();
     }
 
-    private void sendMessage(BufferedWriter writer, IrcSendMessage msg) throws IOException {
+    /**
+     * 直接将消息发送出去，跳过发送等待队列
+     * @param msg
+     * @throws IOException
+     */
+    public synchronized void sendMessageDirect(IrcSendMessage msg) throws IOException {
         writer.write(msg.getMessage());
         writer.flush();
     }
+
+    /**
+     * 将消息添加到发送队列的末尾。
+     * 实际发送时间，根据{@link MsgSendThread}工作情况而定。
+     * @param msg
+     */
+    public void sendMessage(IrcSendMessage msg) {
+        this.msgSendThread.sendMessage(msg);
+    }
+
+    public List<String> getChannel(){
+        return this.channel;
+    }
+    public String getCurrentChannel(){
+        return this.channel.get(this.currentChannelIndex);
+    }
+
+    /**
+     * 用于切换当前频道
+     * @param index
+     */
+    public void changeChannel(int index){
+        if(index < 0 ){
+            index = 0;
+        }
+        if(index >= this.channel.size()){
+            index = this.channel.size() - 1;
+        }
+
+        this.currentChannelIndex = index;
+    }
+
 }
