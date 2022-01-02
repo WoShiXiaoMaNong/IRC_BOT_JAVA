@@ -1,6 +1,7 @@
 package zm.irc.dao;
 
 import org.apache.log4j.Logger;
+import zm.irc.connpool.DbConnectionPool;
 import zm.irc.message.receive.IrcReceiveChatMessage;
 import zm.irc.message.receive.IrcReceiveMessage;
 

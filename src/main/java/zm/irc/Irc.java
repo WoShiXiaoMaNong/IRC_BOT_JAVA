@@ -1,24 +1,40 @@
 package zm.irc;
 
+import org.apache.log4j.Logger;
 import zm.irc.client.IrcClient;
-import zm.irc.dao.DbConnectionPool;
-import zm.irc.message.send.IrcSendMessage;
+import zm.irc.connpool.DbConnectionPool;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class Irc {
-
+    private static final Logger log = Logger.getLogger(Irc.class);
     public static String dbUserName="";
     public static String dbPwd="";
 
+    /**
+     * Startup : java -jar ./target/{Jar file name}.jar {db username} {db pwd}
+     * Startup backend : nohup java -jar ./target/{Jar file name}.jar {db username} {db pwd} >> ./console.log 2>&1 &
+     * @param args
+     * @throws IOException
+     * @throws InterruptedException
+     */
+
     public static void main(String[] args) throws IOException, InterruptedException {
+
+        if(args == null || args.length !=2 ){
+            throw new RuntimeException("Invalid args!" + args);
+        }
         dbUserName = args[0];
         dbPwd = args[1];
+
+        log.info("DB CONN POOL Init...");
+        DbConnectionPool.init(5);
+
+        log.info("DB CONN Self Test...");
         DbConnectionPool.close(DbConnectionPool.getConnection());
+
         String server = "irc.libera.chat";
         String nick = "B_FD3";
         String login = "anyName";
