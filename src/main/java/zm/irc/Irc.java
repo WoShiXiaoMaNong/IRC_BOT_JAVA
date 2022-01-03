@@ -12,7 +12,7 @@ public class Irc {
     private static final Logger log = Logger.getLogger(Irc.class);
     public static String dbUserName="";
     public static String dbPwd="";
-    public static String nick = "bfd_bot";
+    public static String nick = "bfd_bot1";
 
     /**
      * Startup : java -jar ./target/{Jar file name}.jar {db username} {db pwd}
@@ -40,10 +40,10 @@ public class Irc {
 
         String login = "anyName";
         List<String> channel = new ArrayList<>();
-        channel.add("#linuxba");
+       channel.add("#linuxba");
         channel.add("#0dev");
         channel.add("#c_lang_cn");
-        channel.add("#linux");
+        channel.add("#zmtest");
 
 
 
