@@ -12,6 +12,7 @@ import com.mysql.cj.util.StringUtils;
  */
 public class IrcReceiveChatMessage extends IrcReceiveMessage{
     public static final String COMMAND_MSG_PREFIX = "zlang";
+    public static final int FROM_IP_LENGTH = 32;
     private String channel;
     private String fromName;
     private String fromIp;
@@ -66,7 +67,12 @@ public class IrcReceiveChatMessage extends IrcReceiveMessage{
     }
 
     public String getFromIp() {
-        return fromIp;
+        if(fromIp.length() > FROM_IP_LENGTH){
+            return fromIp.substring(0,FROM_IP_LENGTH);
+        }else{
+            return fromIp;
+        }
+
     }
 
     public void setFromIp(String fromIp) {
