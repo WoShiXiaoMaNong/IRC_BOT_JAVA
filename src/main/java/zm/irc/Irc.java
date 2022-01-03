@@ -3,6 +3,8 @@ package zm.irc;
 import org.apache.log4j.Logger;
 import zm.irc.client.IrcClient;
 import zm.irc.connpool.DbConnectionPool;
+import zm.irc.dao.MessageDao;
+import zm.irc.dto.ChannelRankingInfo;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -36,12 +38,14 @@ public class Irc {
         DbConnectionPool.close(DbConnectionPool.getConnection());
 
         String server = "irc.libera.chat";
-        String nick = "B_FD2";
+        String nick = "B_FD11";
         String login = "anyName";
         List<String> channel = new ArrayList<>();
         channel.add("#linuxba");
         channel.add("#0dev");
         channel.add("#c_lang_cn");
+//        channel.add("#zmtest");
+
 
 
         IrcClient client = new IrcClient(server,IrcClient.DEFAULT_PORT,nick,channel);

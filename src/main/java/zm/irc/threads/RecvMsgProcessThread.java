@@ -27,18 +27,27 @@ public class RecvMsgProcessThread implements Runnable{
         try{
             log.info("Receive Message Process Thread Started!");
             IrcReceiveMessage receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
-            while(true){
-                if(receivedMsg == null){
-                    receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
-                    continue;
-                }
-                this.msgProcessorCenter.process(receivedMsg);
-                receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
-            }
+            this.doProcess(receivedMsg);
         }catch (Exception e){
             log.error("error",e);
         }
     }
 
+    private void doProcess( IrcReceiveMessage receivedMsg){
 
+            while(true){
+                try{
+                    if(receivedMsg == null){
+                        receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
+                        continue;
+                    }
+                    this.msgProcessorCenter.process(receivedMsg);
+                    receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
+                }catch (Exception e){
+                    log.error("error",e);
+                }
+            }
+
+
+    }
 }
