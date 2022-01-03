@@ -21,7 +21,7 @@ public class CmdMsgProcessor implements IrcMessageProcessor{
             IrcReceiveChatMessage chatMessage = (IrcReceiveChatMessage) receivedMsg;
             if( chatMessage.isCmdMes()){
                 IrcReceiveCmdMessage cmd = chatMessage.convertTo();
-                shouldContinuePipeLine = this.cmdExecutor.executor(cmd);
+                shouldContinuePipeLine = this.cmdExecutor.executor(cmd,client);
             }
         }
         return shouldContinuePipeLine;

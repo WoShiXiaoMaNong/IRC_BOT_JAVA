@@ -1,5 +1,6 @@
 package zm.irc.cmd;
 
+import zm.irc.client.IrcClient;
 import zm.irc.message.receive.IrcReceiveCmdMessage;
 
 /**
@@ -14,5 +15,5 @@ public interface IrcChatMsgCmd {
      * @param cmd
      * @return
      */
-    boolean execute(IrcReceiveCmdMessage cmd);
+    boolean execute(IrcReceiveCmdMessage cmd, IrcClient client);
 }

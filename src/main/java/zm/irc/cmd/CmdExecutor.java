@@ -1,6 +1,7 @@
 package zm.irc.cmd;
 
 import org.apache.log4j.Logger;
+import zm.irc.client.IrcClient;
 import zm.irc.message.receive.IrcReceiveCmdMessage;
 
 public class CmdExecutor {
@@ -12,7 +13,7 @@ public class CmdExecutor {
      * @param cmd
      * @return
      */
-    public boolean executor(IrcReceiveCmdMessage cmd){
+    public boolean executor(IrcReceiveCmdMessage cmd, IrcClient client){
 
         if(cmd == null){
             return true;
@@ -25,7 +26,7 @@ public class CmdExecutor {
         }
 
         if(ircChatMsgCmd != null){
-            return ircChatMsgCmd.execute(cmd);
+            return ircChatMsgCmd.execute(cmd,client);
         }else{
             return true;
         }
