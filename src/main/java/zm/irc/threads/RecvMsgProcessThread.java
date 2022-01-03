@@ -38,6 +38,7 @@ public class RecvMsgProcessThread implements Runnable{
             while(true){
                 try{
                     if(receivedMsg == null){
+                        Thread.sleep(50);
                         receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
                         continue;
                     }

@@ -27,6 +27,7 @@ public class MsgSendThread implements Runnable{
         while(true){
             try{
                 if(msg == null){
+                    Thread.sleep(50);
                     msg =  localMemoryMsgQueue.getMsgFromSendQueue();
                     continue;
                 }
