@@ -36,13 +36,15 @@ public class Irc {
         DbConnectionPool.close(DbConnectionPool.getConnection());
 
         String server = "irc.libera.chat";
-        String nick = "B_FD31";
+        String nick = "B_FD11";
         String login = "anyName";
         List<String> channel = new ArrayList<>();
-//        channel.add("#linuxba");
-//        channel.add("#0dev");
-//        channel.add("#c_lang_cn");
-        channel.add("#zmtest");
+        channel.add("#linuxba");
+        channel.add("#0dev");
+        channel.add("#c_lang_cn");
+//        channel.add("#zmtest");
+
+
 
         IrcClient client = new IrcClient(server,IrcClient.DEFAULT_PORT,nick,channel);
         client.start();

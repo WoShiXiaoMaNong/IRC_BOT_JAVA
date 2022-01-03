@@ -12,6 +12,7 @@ public class MessageProcessorCenter {
         mpc.setClient(client);
         mpc.add(new PingMessageProcessor());
         mpc.add(new PrintProcessor());
+        mpc.add(new CmdMsgProcessor());
         mpc.add(new DbLogProcessor());
         return mpc;
     }

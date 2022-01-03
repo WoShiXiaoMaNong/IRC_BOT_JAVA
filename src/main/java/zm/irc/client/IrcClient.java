@@ -5,14 +5,16 @@ import org.apache.log4j.Logger;
 import zm.irc.message.send.IrcJoinMessage;
 import zm.irc.message.send.IrcLogonAnyNameMessage;
 import zm.irc.message.send.IrcSendMessage;
+import zm.irc.msgqueue.LocalMemoryMsgQueue;
 import zm.irc.threads.CommandLineInputThread;
 import zm.irc.threads.MsgSendThread;
+import zm.irc.threads.RecvMsgCollectThread;
 import zm.irc.threads.RecvMsgProcessThread;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
-import java.util.Set;
+
 
 
 public class IrcClient {
@@ -36,6 +38,8 @@ public class IrcClient {
     private MsgSendThread msgSendThread;
 
     private RecvMsgProcessThread recvMsgProcessThread;
+
+    private LocalMemoryMsgQueue localMemoryMsgQueue = LocalMemoryMsgQueue.localMemoryMsgQueue;
 
     public IrcClient(String server, int port, String nick, List<String> channel){
         this.server = server;
@@ -80,6 +84,9 @@ public class IrcClient {
         Socket socket = new Socket(this.server, this.port);
         writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        log.info("Prepare Message Collecting Thread!");
+        new Thread(new RecvMsgCollectThread(this)).start();
 
         log.info("Prepare Message Recv Thread!");
         new Thread(new RecvMsgProcessThread(this)).start();
@@ -131,7 +138,7 @@ public class IrcClient {
      * @param msg
      */
     public void sendMessage(IrcSendMessage msg) {
-        this.msgSendThread.sendMessage(msg);
+        localMemoryMsgQueue.addSendQueue(msg);
     }
 
     public List<String> getChannel(){

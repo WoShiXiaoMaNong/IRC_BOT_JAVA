@@ -2,11 +2,19 @@ package zm.irc.dao;
 
 import org.apache.log4j.Logger;
 import zm.irc.connpool.DbConnectionPool;
+import zm.irc.dto.ChannelRankingInfo;
 import zm.irc.message.receive.IrcReceiveChatMessage;
-import zm.irc.message.receive.IrcReceiveMessage;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 
 public class MessageDao {
@@ -38,34 +46,43 @@ public class MessageDao {
         }
     }
 
-    public void saveMessage(IrcReceiveMessage msg){
+
+    public List<ChannelRankingInfo> queryTop10(){
         Connection conn = null;
         PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<ChannelRankingInfo> top10= new ArrayList<>();
         try {
-
-            if (msg instanceof IrcReceiveChatMessage) {
                 conn = DbConnectionPool.getConnection();
-                IrcReceiveChatMessage chatMessage = (IrcReceiveChatMessage) msg;
-                ps = conn.prepareCall("insert into IRC_LOG (msg_type," +
-                        "from_name," +
-                        "from_ip," +
-                        "content," +
-                        "channel) values(?,?,?,?,?)");
-                ps.setString(1,"chat_msg");
-                ps.setString(2,chatMessage.getFromName());
-                ps.setString(3,chatMessage.getFromIp());
-                ps.setString(4,chatMessage.getMessageBody());
-                ps.setString(5,"0dev");
-                ps.execute();
-                log.error("测试 聊天消息：" + msg);
-            } else {
-                log.error("测试：" + msg);
-            }
+                ps = conn.prepareCall("select channel," +
+                        "count(1)," +
+                        "min(time)," +
+                        "max(time)" +
+                        "from IRC_LOG " +
+                        "group by channel");
+                rs = ps.executeQuery();
+
+                while(rs.next()){
+                    ChannelRankingInfo info = new ChannelRankingInfo();
+                    info.setChannel(rs.getString(1));
+                    info.setMsgCount(rs.getInt(2));
+
+                    Timestamp startAt = (Timestamp)rs.getObject(3);
+                    Timestamp endAt = (Timestamp)rs.getObject(4);
+
+                    info.setStartAt(LocalDateTime.ofInstant(Instant.ofEpochMilli(startAt.getTime()), ZoneId.systemDefault()));
+                    info.setEndAt(LocalDateTime.ofInstant(Instant.ofEpochMilli(endAt.getTime()), ZoneId.systemDefault()));
+                    top10.add(info);
+                }
+
+
         }catch (Exception e){
             e.printStackTrace();
         }finally {
+            DbConnectionPool.close(rs);
             DbConnectionPool.close(ps);
             DbConnectionPool.close(conn);
         }
+        return top10;
     }
 }

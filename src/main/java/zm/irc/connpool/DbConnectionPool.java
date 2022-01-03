@@ -65,12 +65,26 @@ public class DbConnectionPool {
 
     public static Connection getConnection(){
        Connection conn = freeConn.poll();
-       if(conn != null) {
+       if(isALive(conn)) {
            inUsedConn.put(conn.hashCode(), conn);
+           return conn;
+       }else{
+           closeConnDirect(conn);
+           freeConn.add(getConnection(Irc.dbUserName,Irc.dbPwd));
+           return getConnection();
        }
-       return conn;
+
     }
 
+    private static void closeConnDirect(Connection conn){
+        try {
+            if (conn != null || !conn.isClosed()) {
+                conn.close();
+            }
+        }catch(Exception e){
+            log.debug("Connection closed!");
+        }
+    }
 
     public static void close(Connection conn){
         if(conn == null){
@@ -114,4 +128,28 @@ public class DbConnectionPool {
             throwables.printStackTrace();
         }
     }
+
+    /**
+     * <pre>
+     * Check the connection is valid or not using the sql "select 1"l
+     * Any Exception throws out , the connection will be marked as invalid;
+     * </pre>
+     * @param conn
+     * @return
+     */
+    private static boolean isALive(Connection conn){
+        try {
+            if (conn == null || conn.isClosed()) {
+                return false;
+            }
+            String sqlForCheck = "select 1";
+            Statement st = conn.createStatement();
+            st.execute(sqlForCheck);
+            close(st);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
 }
