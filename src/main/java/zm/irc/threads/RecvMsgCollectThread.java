@@ -7,9 +7,8 @@ import zm.irc.message.receive.IrcReceiveMessage;
 import zm.irc.msgqueue.LocalMemoryMsgQueue;
 
 
-
-public class RecvMsgProcessThread implements Runnable{
-    private static Logger log = Logger.getLogger(RecvMsgProcessThread.class);
+public class RecvMsgCollectThread implements Runnable{
+    private static Logger log = Logger.getLogger(RecvMsgCollectThread.class);
 
     private LocalMemoryMsgQueue localMemoryMsgQueue = LocalMemoryMsgQueue.localMemoryMsgQueue;
     private IrcClient ircClient;
@@ -17,7 +16,7 @@ public class RecvMsgProcessThread implements Runnable{
     private MessageProcessorCenter msgProcessorCenter;
 
 
-    public RecvMsgProcessThread(IrcClient ircClient){
+    public RecvMsgCollectThread(IrcClient ircClient){
         this.ircClient = ircClient;
         this.msgProcessorCenter = MessageProcessorCenter.build(ircClient);
     }
@@ -25,20 +24,25 @@ public class RecvMsgProcessThread implements Runnable{
     @Override
     public void run() {
         try{
-            log.info("Receive Message Process Thread Started!");
-            IrcReceiveMessage receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
+            log.info("Receive Message Collecting Thread Started!");
+            String msg = this.ircClient.readNewMsgLine();
             while(true){
-                if(receivedMsg == null){
-                    receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
+                if(msg == null){
+                    msg = this.ircClient.readNewMsgLine();
                     continue;
                 }
-                this.msgProcessorCenter.process(receivedMsg);
-                receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
+                IrcReceiveMessage receivedMsg = IrcReceiveMessage.build(msg);
+                this.localMemoryMsgQueue.addIntoReceiveQueue(receivedMsg);
+                msg = this.ircClient.readNewMsgLine();
             }
         }catch (Exception e){
             log.error("error",e);
         }
     }
+
+
+
+
 
 
 }
