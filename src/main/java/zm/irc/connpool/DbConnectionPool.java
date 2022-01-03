@@ -19,6 +19,7 @@ public class DbConnectionPool {
     public static void init(int poolSize) {
         log.info("INIT : DB Conn pool. Size is :" + poolSize);
         for(int i = 0; i< poolSize;i++){
+            log.info("INIT : DB Conn pool. Index " + (i+1));
             freeConn.add(getConnection(Irc.dbUserName,Irc.dbPwd));
         }
         regShutdownHock();
