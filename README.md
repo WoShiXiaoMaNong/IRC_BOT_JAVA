@@ -1,7 +1,7 @@
 # IRC-BOT
 
 #### Description
-This is a IRC Chat room BOT. Is created by KKK. I'm coding it just for fun. ( _**Try not to use Third-Part jar**_ ）
+This is a IRC Chat room BOT. Is created by KKK. I'm coding it just for fun. ( _**The less use third-party jar, the better**_ ）
 
 #### Software Architecture
 Software architecture description

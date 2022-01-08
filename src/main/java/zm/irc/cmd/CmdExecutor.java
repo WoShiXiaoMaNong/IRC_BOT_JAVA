@@ -23,6 +23,10 @@ public class CmdExecutor {
         IrcChatMsgCmd ircChatMsgCmd = null;
         if(CommandNameConst.CMD_TOP10.equals(cmdName)){
             ircChatMsgCmd = new CmdTop10();
+        }else if(CommandNameConst.CMD_JOIN.equals(cmdName)){
+            ircChatMsgCmd = new CmdJoin();
+        }else if(CommandNameConst.CMD_PART.equals(cmdName)){
+            ircChatMsgCmd = new CmdPart();
         }
 
         if(ircChatMsgCmd != null){
