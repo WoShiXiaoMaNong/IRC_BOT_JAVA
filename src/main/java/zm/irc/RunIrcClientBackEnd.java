@@ -1,20 +1,22 @@
 package zm.irc;
 
 import org.apache.log4j.Logger;
+import zm.irc.client.IrcChannel;
 import zm.irc.client.IrcClient;
 import zm.irc.client.ServerInfo;
 import zm.irc.client.SubscribeInfo;
 import zm.irc.connpool.DbConnectionPool;
+import zm.irc.message.receive.IrcReceiveMessage;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IrcClientTest {
-    private static final Logger log = Logger.getLogger(IrcClientTest.class);
+public class RunIrcClientBackEnd {
+    private static final Logger log = Logger.getLogger(RunIrcClientBackEnd.class);
     public static String dbUserName="";
     public static String dbPwd="";
-    public static String nick = "bfd_bot";
+    public static String nick = "bfd_bot1";
 
     /**
      * Startup : java -jar ./target/{Jar file name}.jar {db username} {db pwd}
@@ -63,6 +65,23 @@ public class IrcClientTest {
 
         IrcClient libera = new IrcClient(liberaServerInfo, nick);
         libera.start();
+
+        while(true){
+            try {
+                Thread.sleep(50);
+                Map<String, IrcChannel> channelMap = libera.getAllChannel();
+                if (channelMap == null) {
+                    continue;
+                }
+                libera.switchToNextChannel();
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+
+
 
 
 

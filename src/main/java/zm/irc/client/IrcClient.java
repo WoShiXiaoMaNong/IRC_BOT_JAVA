@@ -1,6 +1,7 @@
 package zm.irc.client;
 
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import zm.irc.message.receive.IrcReceiveMessage;
 import zm.irc.message.send.IrcJoinMessage;
@@ -14,7 +15,9 @@ import zm.irc.threads.RecvMsgProcessThread;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -24,7 +27,10 @@ public class IrcClient {
     public static final int DEFAULT_PORT = 6667;
 
     private Map<String,IrcChannel> channels;
+    private List<IrcChannel> channelList;
+
     private volatile IrcChannel currentChannel;
+    private int currentChannelIndex; // For internal Use only;
     private ServerInfo serverInfo;
     private String nick;
 
@@ -33,6 +39,8 @@ public class IrcClient {
 
     public IrcClient(ServerInfo serverInfo, String nick){
         this.channels = new HashMap<>();
+        this.channelList = new ArrayList<>();
+        this.currentChannelIndex = 0;
         this.serverInfo = serverInfo;
         this.nick = nick;
 
@@ -43,6 +51,10 @@ public class IrcClient {
         if(c !=null){
             this.currentChannel = c;
         }
+    }
+
+    public Map<String,IrcChannel> getAllChannel(){
+        return this.channels;
     }
 
     public IrcChannel getChannel(String channelName){
@@ -118,6 +130,7 @@ public class IrcClient {
 
         channel = new IrcChannel(channelName,this,buffer);
         this.channels.put(channelName,channel);
+        this.channelList.add((channel));
         log.info("加入频道："  + channelName);
         IrcJoinMessage joinMsg = new IrcJoinMessage();
         joinMsg.setChannel(channelName);
@@ -141,4 +154,16 @@ public class IrcClient {
        return this.localMemoryMsgQueue.getSystemMsg();
     }
 
+
+
+    public void switchToNextChannel() {
+        if(CollectionUtils.isEmpty(this.channelList)){
+            return;
+        }
+        if(currentChannelIndex >= this.channelList.size()){
+            this.currentChannelIndex = 0;
+        }
+        this.currentChannel = this.channelList.get(currentChannelIndex);
+        currentChannelIndex++;
+    }
 }
