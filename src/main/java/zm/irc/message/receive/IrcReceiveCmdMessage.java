@@ -1,7 +1,7 @@
 package zm.irc.message.receive;
 
 
-
+import zm.irc.client.IrcClient;
 
 /**
  * <pre>
@@ -16,8 +16,8 @@ public class IrcReceiveCmdMessage extends IrcReceiveChatMessage{
     private String cmdName;
 
 
-    public IrcReceiveCmdMessage(IrcReceiveChatMessage chatMsg){
-        this(chatMsg.getOriginMsg());
+    public IrcReceiveCmdMessage(IrcReceiveChatMessage chatMsg, IrcClient ircClient){
+        super(chatMsg.getOriginMsg(),ircClient);
         this.init(chatMsg);
     }
 
@@ -44,7 +44,4 @@ public class IrcReceiveCmdMessage extends IrcReceiveChatMessage{
     }
 
 
-    private IrcReceiveCmdMessage(String originMsg) {
-        super(originMsg);
-    }
 }

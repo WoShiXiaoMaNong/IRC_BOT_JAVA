@@ -21,12 +21,10 @@ public class IrcClient {
     private static Logger log = Logger.getLogger(IrcClient.class.getClass());
 
     public static final int DEFAULT_PORT = 6667;
-    private String server;
-    private int port;
+    private ServerInfo serverInfo;
 
     private String nick;
 
-    private List<String> channel;
 
     private int currentChannelIndex;
 
@@ -41,14 +39,13 @@ public class IrcClient {
 
     private LocalMemoryMsgQueue localMemoryMsgQueue = LocalMemoryMsgQueue.localMemoryMsgQueue;
 
-    public IrcClient(String server, int port, String nick, List<String> channel){
-        this.server = server;
-        this.port = port;
+    public IrcClient(ServerInfo serverInfo, String nick){
+        this.serverInfo = serverInfo;
         this.nick = nick;
         this.msgSendThread = new MsgSendThread(this);
 
         this.recvMsgProcessThread = new RecvMsgProcessThread(this);
-        this.channel = channel;
+
         this.currentChannelIndex = 0;
     }
 
@@ -79,9 +76,9 @@ public class IrcClient {
 
 
     public void start() throws IOException {
-        log.info(String.format("Start to connect IRC server(Server:%s, Port:%s)",this.server,this.port));
+        log.info(String.format("Start to connect IRC server(Server:%s, Port:%s)",this.serverInfo.getServer(), this.serverInfo.getPort()));
 
-        Socket socket = new Socket(this.server, this.port);
+        Socket socket = new Socket(this.serverInfo.getServer(), this.serverInfo.getPort());
         writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
@@ -99,10 +96,10 @@ public class IrcClient {
 
 
         try {
-            log.info("使用昵称:" + nick + " 登录频道：" + this.channel);
+            log.info("使用昵称:" + nick + " 登录频道：" + this.serverInfo.getChannel());
             this.logon(nick);
             Thread.sleep(3000);
-            this.channel.forEach(c->{
+            serverInfo.getChannel().forEach(c->{
                 join(c);
             });
 
@@ -142,10 +139,10 @@ public class IrcClient {
     }
 
     public List<String> getChannel(){
-        return this.channel;
+        return this.serverInfo.getChannel();
     }
     public String getCurrentChannel(){
-        return this.channel.get(this.currentChannelIndex);
+        return this.serverInfo.getChannel().get(this.currentChannelIndex);
     }
 
     /**
@@ -156,11 +153,20 @@ public class IrcClient {
         if(index < 0 ){
             index = 0;
         }
-        if(index >= this.channel.size()){
-            index = this.channel.size() - 1;
+        if(index >=this.serverInfo.getChannel().size()){
+            index =this.serverInfo.getChannel().size() - 1;
         }
 
         this.currentChannelIndex = index;
+    }
+
+
+    public String getServer(){
+        return this.serverInfo.getServer();
+    }
+
+    public int getPort(){
+        return this.serverInfo.getPort();
     }
 
 }

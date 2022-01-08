@@ -4,6 +4,7 @@ package zm.irc.msgqueue;
 import zm.irc.message.receive.IrcReceiveMessage;
 import zm.irc.message.send.IrcSendMessage;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class LocalMemoryMsgQueue {

@@ -1,6 +1,8 @@
 package zm.irc.dao;
 
 import org.apache.log4j.Logger;
+import zm.irc.Irc;
+import zm.irc.client.IrcClient;
 import zm.irc.connpool.DbConnectionPool;
 import zm.irc.dto.ChannelRankingInfo;
 import zm.irc.message.receive.IrcReceiveChatMessage;
@@ -14,7 +16,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+
 
 
 public class MessageDao {
@@ -25,17 +27,19 @@ public class MessageDao {
         PreparedStatement ps = null;
         try {
                 conn = DbConnectionPool.getConnection();
-
+                IrcClient ircClient = msg.getIrcClient();
                 ps = conn.prepareCall("insert into IRC_LOG (msg_type," +
                         "from_name," +
                         "from_ip," +
                         "content," +
-                        "channel) values(?,?,?,?,?)");
+                        "channel," +
+                        "host) values(?,?,?,?,?,?)");
                 ps.setString(1,"chat_msg");
                 ps.setString(2,msg.getFromName());
                 ps.setString(3,msg.getFromIp());
                 ps.setString(4,msg.getMessageBody());
                 ps.setString(5,msg.getChannel());
+                ps.setString(6, ircClient.getServer() + ":" +ircClient.getPort());
                 ps.execute();
 
         }catch (Exception e){

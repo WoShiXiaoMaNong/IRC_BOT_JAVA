@@ -2,6 +2,7 @@ package zm.irc.message.receive;
 
 
 import com.mysql.cj.util.StringUtils;
+import zm.irc.client.IrcClient;
 
 /**
  * <pre>
@@ -22,8 +23,8 @@ public class IrcReceiveChatMessage extends IrcReceiveMessage{
      * Format->  :{from-name}!~{from-ip} PRIVMSG {channel} :{msg}
      * @param originMsg
      */
-    public IrcReceiveChatMessage(String originMsg) {
-        super(originMsg);
+    public IrcReceiveChatMessage(String originMsg, IrcClient ircClient) {
+        super(originMsg,ircClient);
 
         this.parseMsg(originMsg);
     }
@@ -50,6 +51,7 @@ public class IrcReceiveChatMessage extends IrcReceiveMessage{
         this.setMessageBody(splitBySpace,3, separator);
     }
 
+    @Override
     public String getChannel() {
         return channel;
     }
@@ -105,7 +107,7 @@ public class IrcReceiveChatMessage extends IrcReceiveMessage{
     }
 
     public IrcReceiveCmdMessage convertTo(){
-        return new IrcReceiveCmdMessage(this);
+        return new IrcReceiveCmdMessage(this,this.getIrcClient());
     }
 
     @Override

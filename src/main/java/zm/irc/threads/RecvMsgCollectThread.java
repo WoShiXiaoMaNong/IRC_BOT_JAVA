@@ -31,7 +31,7 @@ public class RecvMsgCollectThread implements Runnable{
                     msg = this.ircClient.readNewMsgLine();
                     continue;
                 }
-                IrcReceiveMessage receivedMsg = IrcReceiveMessage.build(msg);
+                IrcReceiveMessage receivedMsg = IrcReceiveMessage.build(msg,this.ircClient);
                 this.localMemoryMsgQueue.addIntoReceiveQueue(receivedMsg);
                 msg = this.ircClient.readNewMsgLine();
             }
