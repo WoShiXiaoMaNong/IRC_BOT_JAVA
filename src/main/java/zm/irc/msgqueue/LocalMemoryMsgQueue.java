@@ -30,7 +30,7 @@ public class LocalMemoryMsgQueue {
         this.receiveQueues = new ConcurrentHashMap<>();
     }
 
-    public boolean registerReceiveQueue(String queueName){
+    public synchronized boolean  registerReceiveQueue(String queueName){
         if(this.receiveQueues.containsKey(queueName)){
             log.error("Queue Name exist!" + queueName);
             return false;
