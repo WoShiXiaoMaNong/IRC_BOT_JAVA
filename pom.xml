@@ -144,7 +144,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                             <!-- jar启动入口类-->
-                            <mainClass>zm.irc.Irc</mainClass>
+                            <mainClass>zm.irc.IrcClientTest</mainClass>
                         </manifest>
                         <manifestEntries>
                             <!-- 在Class-Path下添加配置文件的路径 -->

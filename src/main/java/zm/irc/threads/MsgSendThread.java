@@ -5,7 +5,8 @@ import zm.irc.client.IrcClient;
 import zm.irc.message.send.IrcSendMessage;
 import zm.irc.msgqueue.LocalMemoryMsgQueue;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 
 public class MsgSendThread implements Runnable{
@@ -13,11 +14,10 @@ public class MsgSendThread implements Runnable{
 
     private LocalMemoryMsgQueue localMemoryMsgQueue = LocalMemoryMsgQueue.localMemoryMsgQueue;
 
+    private  BufferedWriter writer;
 
-    private IrcClient ircClient;
-
-    public MsgSendThread(IrcClient ircClient){
-        this.ircClient = ircClient;
+    public MsgSendThread( BufferedWriter writer){
+        this.writer = writer;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class MsgSendThread implements Runnable{
                     msg =  localMemoryMsgQueue.getMsgFromSendQueue();
                     continue;
                 }
-                this.ircClient.sendMessageDirect(msg);
+                this.sendMessageDirect(msg);
                 msg = localMemoryMsgQueue.getMsgFromSendQueue();
             }catch (Exception e){
                 log.error("error",e);
@@ -39,4 +39,17 @@ public class MsgSendThread implements Runnable{
         }
     }
 
+
+    /**
+     * <pre>
+     * Please do not send message by this method!
+     * Only for {@link MsgSendThread}.
+     * </pre>
+     * @param msg
+     * @throws IOException
+     */
+    public synchronized void sendMessageDirect(IrcSendMessage msg) throws IOException {
+        writer.write(msg.getMessage());
+        writer.flush();
+    }
 }

@@ -34,6 +34,9 @@ public class MessageProcessorCenter {
     }
 
     public void process(IrcReceiveMessage msg){
+        if(msg == null){
+            return;
+        }
         for( IrcMessageProcessor imp : this.impList){
             boolean shouldContinue = imp.processor(this.client,msg);
             if( !shouldContinue){

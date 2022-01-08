@@ -1,7 +1,6 @@
 package zm.irc.dao;
 
 import org.apache.log4j.Logger;
-import zm.irc.Irc;
 import zm.irc.client.IrcClient;
 import zm.irc.connpool.DbConnectionPool;
 import zm.irc.dto.ChannelRankingInfo;
@@ -39,7 +38,7 @@ public class MessageDao {
                 ps.setString(3,msg.getFromIp());
                 ps.setString(4,msg.getMessageBody());
                 ps.setString(5,msg.getChannel());
-                ps.setString(6, ircClient.getServer() + ":" +ircClient.getPort());
+                ps.setString(6, ircClient.getServerInfo().getServer() + ":" +ircClient.getServerInfo().getPort());
                 ps.execute();
 
         }catch (Exception e){

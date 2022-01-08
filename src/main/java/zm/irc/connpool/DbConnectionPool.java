@@ -2,7 +2,7 @@ package zm.irc.connpool;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
-import zm.irc.Irc;
+import zm.irc.IrcClientTest;
 
 import java.sql.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +20,7 @@ public class DbConnectionPool {
         log.info("INIT : DB Conn pool. Size is :" + poolSize);
         for(int i = 0; i< poolSize;i++){
             log.info("INIT : DB Conn pool. Index " + (i+1));
-            freeConn.add(getConnection(Irc.dbUserName,Irc.dbPwd));
+            freeConn.add(getConnection(IrcClientTest.dbUserName, IrcClientTest.dbPwd));
         }
         regShutdownHock();
         log.info("INIT finished");
@@ -70,7 +70,7 @@ public class DbConnectionPool {
            return conn;
        }else{
            closeConnDirect(conn);
-           freeConn.add(getConnection(Irc.dbUserName,Irc.dbPwd));
+           freeConn.add(getConnection(IrcClientTest.dbUserName, IrcClientTest.dbPwd));
            return getConnection();
        }
 

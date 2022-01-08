@@ -18,7 +18,7 @@ public interface IrcSendMessage {
         }else{
             msg = new IrcChatMessage();
             ((IrcChatMessage)msg).setMsg(msgStr);
-            ((IrcChatMessage)msg).setTargetChanel(channel);
+            ((IrcChatMessage)msg).setChannel(channel);
         }
 
 
@@ -27,6 +27,10 @@ public interface IrcSendMessage {
 
 
         return msg;
+    }
+
+    default void setChannel(String channelName){
+        //Do nothing.
     }
 
     String getMessage();

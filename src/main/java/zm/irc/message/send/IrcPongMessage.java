@@ -15,4 +15,5 @@ public class IrcPongMessage implements IrcSendMessage {
     public String getMessage() {
         return "PONG " + originPingMessage.substring(5) + "\r\n";
     }
+
 }

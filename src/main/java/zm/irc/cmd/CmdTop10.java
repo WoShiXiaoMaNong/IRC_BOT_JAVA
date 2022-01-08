@@ -6,7 +6,6 @@ import zm.irc.client.IrcClient;
 import zm.irc.dto.ChannelRankingInfo;
 import zm.irc.message.receive.IrcReceiveCmdMessage;
 import zm.irc.message.send.IrcChatMessage;
-import zm.irc.message.send.IrcSendMessage;
 import zm.irc.msgqueue.LocalMemoryMsgQueue;
 import zm.irc.service.MsgSummaryInfoService;
 
@@ -40,7 +39,7 @@ public class CmdTop10 implements IrcChatMsgCmd{
                ChannelRankingInfo top = top10.get(i);
                String msgBody = String.format("Top %d : %s",i + 1, top.getTopMsg());
                IrcChatMessage msg = new IrcChatMessage();
-               msg.setTargetChanel(cmd.getChannel());
+               msg.setChannel(cmd.getChannel());
                msg.setMsg(msgBody);
                this.localMemoryMsgQueue.addSendQueue(msg);
             }

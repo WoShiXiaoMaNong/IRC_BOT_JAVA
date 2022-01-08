@@ -8,8 +8,19 @@ public class IrcReceiveInfoMessage extends IrcReceiveMessage{
 
     public IrcReceiveInfoMessage(String originMsg, IrcClient ircClient) {
         super(originMsg,ircClient);
+        this.parseMsg(originMsg);
 
+    }
+    private void parseMsg(String originMsg){
+        String separator = " ";
+        String[] splitBySpace = originMsg.split(separator);
 
+        this.setChannel(splitBySpace[2]);
+
+    }
+
+    public void setChannel(String channel){
+        this.channel = channel;
     }
 
     @Override

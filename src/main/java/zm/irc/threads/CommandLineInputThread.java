@@ -1,12 +1,12 @@
 package zm.irc.threads;
 
 import org.apache.log4j.Logger;
+import zm.irc.client.IrcChannel;
 import zm.irc.client.IrcClient;
 import zm.irc.message.send.IrcSendMessage;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class CommandLineInputThread implements Runnable{
@@ -26,12 +26,30 @@ public class CommandLineInputThread implements Runnable{
             while (true) {
 
                 String msgStr = br.readLine();
-                IrcSendMessage msg = IrcSendMessage.build(ircClient.getCurrentChannel(), msgStr);
-                this.ircClient.sendMessage(msg);
+                if(msgStr.startsWith("/zc")){
+                    this.processAsCommand(msgStr);
+                    continue;
+                }
+
+                IrcChannel channel = ircClient.getCurrentChannel();
+                if(channel != null){
+                    channel.send(msgStr);
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
+
+    private void processAsCommand(String command){
+        String param[] = command.split(" ");
+        if("SC".equals(param[1])){
+            String channelName = param[2];
+            this.ircClient.switchChannel(channelName);
+        }else if("join".equals(param[1])){
+            String channelName = param[2];
+            this.ircClient.join(channelName);
+        }
+    }
 }

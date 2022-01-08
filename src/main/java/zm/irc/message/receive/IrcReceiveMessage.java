@@ -7,7 +7,7 @@ public abstract class IrcReceiveMessage {
     private static final Logger log = Logger.getLogger(IrcReceiveMessage.class);
 
 
-    public static IrcReceiveMessage build(String msgStr,IrcClient ircClient){
+    public static IrcReceiveMessage build(String msgStr, IrcClient ircClient){
 
         if(msgStr.startsWith("PING")){
             log.debug("PING message Received!");

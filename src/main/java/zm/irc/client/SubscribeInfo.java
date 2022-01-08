@@ -1,7 +1,5 @@
 package zm.irc.client;
 
-import zm.irc.Irc;
-
 public class SubscribeInfo {
     private String server;
     private String channel;

@@ -11,6 +11,7 @@ public class IrcJoinMessage implements IrcSendMessage {
         return channel;
     }
 
+    @Override
     public void setChannel(String channel) {
         this.channel = channel;
     }
