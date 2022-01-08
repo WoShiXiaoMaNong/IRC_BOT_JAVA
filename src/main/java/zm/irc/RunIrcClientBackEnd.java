@@ -16,7 +16,7 @@ public class RunIrcClientBackEnd {
     private static final Logger log = Logger.getLogger(RunIrcClientBackEnd.class);
     public static String dbUserName="";
     public static String dbPwd="";
-    public static String nick = "bfd_bot1";
+    public static String nick = "bfd_bot";
 
     /**
      * Startup : java -jar ./target/{Jar file name}.jar {db username} {db pwd}
