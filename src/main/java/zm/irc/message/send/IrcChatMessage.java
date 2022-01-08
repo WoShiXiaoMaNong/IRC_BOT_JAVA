@@ -7,11 +7,12 @@ public class IrcChatMessage implements IrcSendMessage {
 
     private String msg;
 
-    public String getTargetChanel() {
+    public String getChannel() {
         return targetChanel;
     }
 
-    public void setTargetChanel(String targetChanel) {
+    @Override
+    public void setChannel(String targetChanel) {
         this.targetChanel = targetChanel;
     }
 
@@ -22,6 +23,7 @@ public class IrcChatMessage implements IrcSendMessage {
     public void setMsg(String msg) {
         this.msg = msg;
     }
+
 
     @Override
     public String getMessage() {

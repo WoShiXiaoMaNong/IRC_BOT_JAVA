@@ -2,6 +2,7 @@ package zm.irc.message.receive;
 
 
 import com.mysql.cj.util.StringUtils;
+import zm.irc.client.IrcClient;
 
 /**
  * <pre>
@@ -12,6 +13,7 @@ import com.mysql.cj.util.StringUtils;
  */
 public class IrcReceiveChatMessage extends IrcReceiveMessage{
     public static final String COMMAND_MSG_PREFIX = "zlang";
+    public static final int FROM_IP_LENGTH = 32;
     private String channel;
     private String fromName;
     private String fromIp;
@@ -21,8 +23,8 @@ public class IrcReceiveChatMessage extends IrcReceiveMessage{
      * Format->  :{from-name}!~{from-ip} PRIVMSG {channel} :{msg}
      * @param originMsg
      */
-    public IrcReceiveChatMessage(String originMsg) {
-        super(originMsg);
+    public IrcReceiveChatMessage(String originMsg, IrcClient ircClient) {
+        super(originMsg,ircClient);
 
         this.parseMsg(originMsg);
     }
@@ -49,6 +51,7 @@ public class IrcReceiveChatMessage extends IrcReceiveMessage{
         this.setMessageBody(splitBySpace,3, separator);
     }
 
+    @Override
     public String getChannel() {
         return channel;
     }
@@ -66,7 +69,12 @@ public class IrcReceiveChatMessage extends IrcReceiveMessage{
     }
 
     public String getFromIp() {
-        return fromIp;
+        if(fromIp.length() > FROM_IP_LENGTH){
+            return fromIp.substring(0,FROM_IP_LENGTH);
+        }else{
+            return fromIp;
+        }
+
     }
 
     public void setFromIp(String fromIp) {
@@ -99,12 +107,12 @@ public class IrcReceiveChatMessage extends IrcReceiveMessage{
     }
 
     public IrcReceiveCmdMessage convertTo(){
-        return new IrcReceiveCmdMessage(this);
+        return new IrcReceiveCmdMessage(this,this.getIrcClient());
     }
 
     @Override
     public boolean shouldPrint() {
-        return true;
+        return this.getIrcClient().isShouldPrintChatMsg();
     }
 
     @Override

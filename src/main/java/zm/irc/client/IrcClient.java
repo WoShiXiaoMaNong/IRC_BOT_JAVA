@@ -1,7 +1,9 @@
 package zm.irc.client;
 
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
+import zm.irc.message.receive.IrcReceiveMessage;
 import zm.irc.message.send.IrcJoinMessage;
 import zm.irc.message.send.IrcLogonAnyNameMessage;
 import zm.irc.message.send.IrcSendMessage;
@@ -13,96 +15,94 @@ import zm.irc.threads.RecvMsgProcessThread;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 
 public class IrcClient {
-    private static Logger log = Logger.getLogger(IrcClient.class.getClass());
-
+    private static final Logger log = Logger.getLogger(IrcClient.class);
     public static final int DEFAULT_PORT = 6667;
-    private String server;
-    private int port;
 
+    private Map<String,IrcChannel> channels;
+    private List<IrcChannel> channelList;
+
+    private volatile IrcChannel currentChannel;
+    private int currentChannelIndex; // For internal Use only;
+    private ServerInfo serverInfo;
     private String nick;
 
-    private List<String> channel;
-
-    private int currentChannelIndex;
-
-    private BufferedWriter writer;
-    private  BufferedReader reader;
-
-
-
-    private MsgSendThread msgSendThread;
-
-    private RecvMsgProcessThread recvMsgProcessThread;
+    private boolean shouldPrintChatMsg;
 
     private LocalMemoryMsgQueue localMemoryMsgQueue = LocalMemoryMsgQueue.localMemoryMsgQueue;
 
-    public IrcClient(String server, int port, String nick, List<String> channel){
-        this.server = server;
-        this.port = port;
-        this.nick = nick;
-        this.msgSendThread = new MsgSendThread(this);
-
-        this.recvMsgProcessThread = new RecvMsgProcessThread(this);
-        this.channel = channel;
+    public IrcClient(ServerInfo serverInfo, String nick){
+        this.channels = new HashMap<>();
+        this.channelList = new ArrayList<>();
         this.currentChannelIndex = 0;
+        this.serverInfo = serverInfo;
+        this.nick = nick;
+        this.shouldPrintChatMsg = true;
+
     }
 
-    public void logon(String nick){
-        IrcLogonAnyNameMessage logonMsg = new IrcLogonAnyNameMessage();
-        logonMsg.setNick(nick);
-        this.sendMessage(logonMsg);
+    public boolean isShouldPrintChatMsg() {
+        return shouldPrintChatMsg;
     }
 
-    /**
-     * 加入指定频道
-     * @param channel
-     */
-    private void join(String channel){
-        log.info("加入频道："  + channel);
-        IrcJoinMessage joinMsg = new IrcJoinMessage();
-        joinMsg.setChannel(channel);
-        this.sendMessage(joinMsg);
+    public void setShouldPrintChatMsg(boolean shouldPrintChatMsg) {
+        this.shouldPrintChatMsg = shouldPrintChatMsg;
     }
 
-    /**
-     * 用于认证昵称，暂时未启用
-     * @param pwd
-     */
-    public void identify(String pwd) {
-        throw new RuntimeException("TBD");
+    public void switchChannel(String channelName){
+        IrcChannel c = this.channels.get(channelName);
+        if(c !=null){
+            this.currentChannel = c;
+        }
     }
 
+    public Map<String,IrcChannel> getAllChannel(){
+        return this.channels;
+    }
+
+    public IrcChannel getChannel(String channelName){
+        return this.channels.get(channelName);
+    }
+
+    public ServerInfo getServerInfo(){
+        return  this.serverInfo;
+    }
+
+    public IrcChannel getCurrentChannel(){
+        return this.currentChannel;
+    }
 
     public void start() throws IOException {
-        log.info(String.format("Start to connect IRC server(Server:%s, Port:%s)",this.server,this.port));
+        log.info(String.format("Start to connect IRC server(Server:%s, Port:%s)",this.serverInfo.getServer(), this.serverInfo.getPort()));
 
-        Socket socket = new Socket(this.server, this.port);
-        writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        Socket socket = new Socket(this.serverInfo.getServer(), this.serverInfo.getPort());
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         log.info("Prepare Message Collecting Thread!");
-        new Thread(new RecvMsgCollectThread(this)).start();
+        new Thread(new RecvMsgCollectThread(this,reader)).start();
 
         log.info("Prepare Message Recv Thread!");
         new Thread(new RecvMsgProcessThread(this)).start();
 
         log.info("Prepare Message Sender Thread!");
-        new Thread(this.msgSendThread).start();
+        new Thread(new MsgSendThread(writer)).start();
 
-        log.info("准备消息输入线程！");
+        log.info("Prepare Command-Line Input Thread！");
         new Thread(new CommandLineInputThread(this)).start();
 
 
         try {
-            log.info("使用昵称:" + nick + " 登录频道：" + this.channel);
+            log.info("使用昵称:" + nick + " 登录频道：" + this.serverInfo.getChannel());
             this.logon(nick);
             Thread.sleep(3000);
-            this.channel.forEach(c->{
+            serverInfo.getChannel().forEach(c->{
                 join(c);
             });
 
@@ -110,27 +110,49 @@ public class IrcClient {
         }catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
+
+
+    private void logon(String nick){
+        IrcLogonAnyNameMessage logonMsg = new IrcLogonAnyNameMessage();
+        logonMsg.setNick(nick);
+        this.sendMessage(logonMsg);
+    }
     /**
-     * 读取消息
+     * Connect channel and return the channel object.
+     * @param channelName
      * @return
-     * @throws IOException
      */
-    public String readNewMsgLine() throws IOException {
-        return this.reader.readLine();
+    public IrcChannel join(String channelName){
+        IrcChannel channel = this.channels.get(channelName);
+        boolean succeed = this.localMemoryMsgQueue.registerReceiveQueue(channelName);
+
+        if( channel != null){
+            log.warn("The channel already connected!" + channel);
+            return channel;
+        }
+        if( !succeed){
+            log.error("Msg queue register error!");
+            return null;
+        }
+
+        /**
+         * do connect logic.
+         */
+
+        channel = new IrcChannel(channelName,this);
+        this.channels.put(channelName,channel);
+        this.channelList.add((channel));
+        log.info("加入频道："  + channelName);
+        IrcJoinMessage joinMsg = new IrcJoinMessage();
+        joinMsg.setChannel(channelName);
+        this.sendMessage(joinMsg);
+
+        this.currentChannel = channel;
+        return this.currentChannel;
     }
 
-    /**
-     * 直接将消息发送出去，跳过发送等待队列
-     * @param msg
-     * @throws IOException
-     */
-    public synchronized void sendMessageDirect(IrcSendMessage msg) throws IOException {
-        writer.write(msg.getMessage());
-        writer.flush();
-    }
 
     /**
      * 将消息添加到发送队列的末尾。
@@ -141,26 +163,20 @@ public class IrcClient {
         localMemoryMsgQueue.addSendQueue(msg);
     }
 
-    public List<String> getChannel(){
-        return this.channel;
-    }
-    public String getCurrentChannel(){
-        return this.channel.get(this.currentChannelIndex);
+    public IrcReceiveMessage getSystemMsg(){
+       return this.localMemoryMsgQueue.getSystemMsg();
     }
 
-    /**
-     * 用于切换当前频道
-     * @param index
-     */
-    public void changeChannel(int index){
-        if(index < 0 ){
-            index = 0;
+
+
+    public void switchToNextChannel() {
+        if(CollectionUtils.isEmpty(this.channelList)){
+            return;
         }
-        if(index >= this.channel.size()){
-            index = this.channel.size() - 1;
+        if(currentChannelIndex >= this.channelList.size()){
+            this.currentChannelIndex = 0;
         }
-
-        this.currentChannelIndex = index;
+        this.currentChannel = this.channelList.get(currentChannelIndex);
+        currentChannelIndex++;
     }
-
 }

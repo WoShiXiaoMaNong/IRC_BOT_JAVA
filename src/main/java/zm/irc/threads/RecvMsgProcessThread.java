@@ -1,6 +1,7 @@
 package zm.irc.threads;
 
 import org.apache.log4j.Logger;
+import zm.irc.client.IrcChannel;
 import zm.irc.client.IrcClient;
 import zm.irc.message.processor.MessageProcessorCenter;
 import zm.irc.message.receive.IrcReceiveMessage;
@@ -26,27 +27,36 @@ public class RecvMsgProcessThread implements Runnable{
     public void run() {
         try{
             log.info("Receive Message Process Thread Started!");
-            IrcReceiveMessage receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
-            this.doProcess(receivedMsg);
+
+            this.doProcess();
         }catch (Exception e){
             log.error("error",e);
         }
     }
 
-    private void doProcess( IrcReceiveMessage receivedMsg){
-
-            while(true){
-                try{
-                    if(receivedMsg == null){
-                        receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
-                        continue;
-                    }
-                    this.msgProcessorCenter.process(receivedMsg);
-                    receivedMsg = this.localMemoryMsgQueue.getMsgFromSReceiveQueue();
-                }catch (Exception e){
-                    log.error("error",e);
+    private void doProcess( ) {
+        IrcChannel currentChannel;
+        IrcReceiveMessage receivedMsg;
+        IrcReceiveMessage systemMsg;
+        while (true) {
+            try {
+                currentChannel = this.ircClient.getCurrentChannel();
+                if(currentChannel == null){
+                    Thread.sleep(50);
+                    continue;
                 }
+                receivedMsg = currentChannel.receiveMsg();
+                systemMsg = this.ircClient.getSystemMsg();
+                if (receivedMsg == null && systemMsg == null) {
+                    Thread.sleep(50);
+                    continue;
+                }
+                this.msgProcessorCenter.process(systemMsg);
+                this.msgProcessorCenter.process(receivedMsg);
+            } catch (Exception e) {
+                log.error("error", e);
             }
+        }
 
 
     }
