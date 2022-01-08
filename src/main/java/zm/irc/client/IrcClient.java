@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class IrcClient {
@@ -34,6 +33,7 @@ public class IrcClient {
     private ServerInfo serverInfo;
     private String nick;
 
+    private boolean shouldPrintChatMsg;
 
     private LocalMemoryMsgQueue localMemoryMsgQueue = LocalMemoryMsgQueue.localMemoryMsgQueue;
 
@@ -43,7 +43,16 @@ public class IrcClient {
         this.currentChannelIndex = 0;
         this.serverInfo = serverInfo;
         this.nick = nick;
+        this.shouldPrintChatMsg = true;
 
+    }
+
+    public boolean isShouldPrintChatMsg() {
+        return shouldPrintChatMsg;
+    }
+
+    public void setShouldPrintChatMsg(boolean shouldPrintChatMsg) {
+        this.shouldPrintChatMsg = shouldPrintChatMsg;
     }
 
     public void switchChannel(String channelName){

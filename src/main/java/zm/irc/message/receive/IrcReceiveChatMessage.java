@@ -112,7 +112,7 @@ public class IrcReceiveChatMessage extends IrcReceiveMessage{
 
     @Override
     public boolean shouldPrint() {
-        return true;
+        return this.getIrcClient().isShouldPrintChatMsg();
     }
 
     @Override

@@ -35,9 +35,10 @@ public class RunIrcClientBackEnd {
 
         init(dbUserName,dbPwd);
         IrcClient libera = doStart();
-
+        libera.setShouldPrintChatMsg(false); // Do not print the chat message
         /**
-         * Loop all channel and clean their message buffer by print method.
+         * Loop all channel and clean their message buffer.
+         * The client will consume message from current channel's buffer.
          */
         while(true){
             try {
@@ -46,7 +47,7 @@ public class RunIrcClientBackEnd {
                 if (channelMap == null) {
                     continue;
                 }
-                libera.switchToNextChannel();
+                libera.switchToNextChannel(); // Switch current channel one by one.
 
             }catch (Exception e){
                 e.printStackTrace();
@@ -73,10 +74,10 @@ public class RunIrcClientBackEnd {
         SubscribeInfo s = new SubscribeInfo("irc.libera.chat", "#zmtest", null);
 
         ServerInfo liberaServerInfo = new ServerInfo("irc.libera.chat", IrcClient.DEFAULT_PORT);
-      //  liberaServerInfo.addChannel("#linuxba");
-      //  liberaServerInfo.addChannel("#c_lang_cn");
+        liberaServerInfo.addChannel("#linuxba");
+        liberaServerInfo.addChannel("#c_lang_cn");
         liberaServerInfo.addChannel("#zmtest");
-       // liberaServerInfo.addChannel("#linux");
+        liberaServerInfo.addChannel("#linux");
         liberaServerInfo.addChannel("#0dev");
 
         IrcClient libera = new IrcClient(liberaServerInfo, nick);
