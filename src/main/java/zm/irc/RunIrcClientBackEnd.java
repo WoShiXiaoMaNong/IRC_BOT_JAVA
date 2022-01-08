@@ -34,7 +34,7 @@ public class RunIrcClientBackEnd {
         dbPwd = args[1];
 
         init(dbUserName,dbPwd);
-        IrcClient libera = doStart();
+        IrcClient libera = initClient();
 
         /**
          * Loop all channel and clean their message buffer.
@@ -43,14 +43,9 @@ public class RunIrcClientBackEnd {
         while(true){
             try {
                 Thread.sleep(50);
-                Map<String, IrcChannel> channelMap = libera.getAllChannel();
-                if (channelMap == null) {
-                    continue;
-                }
                 libera.switchToNextChannel(); // Switch current channel one by one.
-
             }catch (Exception e){
-                e.printStackTrace();
+                log.error("Switch channel error！",e);
             }
         }
 
@@ -65,7 +60,7 @@ public class RunIrcClientBackEnd {
         DbConnectionPool.close(DbConnectionPool.getConnection());
     }
 
-    private static IrcClient doStart() throws IOException {
+    private static IrcClient initClient() throws IOException {
 
 
         /**Key host+channel : irc.2600.net#zmtest, value the Subscribes of this channel*/

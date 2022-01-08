@@ -98,18 +98,20 @@ public class IrcClient {
         new Thread(new CommandLineInputThread(this)).start();
 
 
-        try {
-            log.info("使用昵称:" + nick + " 登录频道：" + this.serverInfo.getChannel());
+
+            log.info("Nick Name :" + nick + " Channel List ：" + this.serverInfo.getChannel());
             this.logon(nick);
+        try {
             Thread.sleep(3000);
+        }catch (Exception e){
+            log.error("Thread Sleep error!",e);
+        }
             serverInfo.getChannel().forEach(c->{
                 join(c);
             });
 
 
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+
     }
 
 
