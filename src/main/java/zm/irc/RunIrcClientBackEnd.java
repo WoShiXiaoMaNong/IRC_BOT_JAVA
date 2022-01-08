@@ -35,7 +35,7 @@ public class RunIrcClientBackEnd {
 
         init(dbUserName,dbPwd);
         IrcClient libera = doStart();
-        libera.setShouldPrintChatMsg(false); // Do not print the chat message
+
         /**
          * Loop all channel and clean their message buffer.
          * The client will consume message from current channel's buffer.
@@ -77,7 +77,7 @@ public class RunIrcClientBackEnd {
         liberaServerInfo.addChannel("#linuxba");
         liberaServerInfo.addChannel("#c_lang_cn");
         liberaServerInfo.addChannel("#zmtest");
-        liberaServerInfo.addChannel("#linux");
+     //   liberaServerInfo.addChannel("#linux");
         liberaServerInfo.addChannel("#0dev");
 
         IrcClient libera = new IrcClient(liberaServerInfo, nick);
