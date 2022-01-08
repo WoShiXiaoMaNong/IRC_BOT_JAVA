@@ -117,18 +117,22 @@ public class IrcClient {
      */
     public IrcChannel join(String channelName){
         IrcChannel channel = this.channels.get(channelName);
-        ConcurrentLinkedQueue<IrcReceiveMessage> buffer = this.localMemoryMsgQueue.registerReceiveQueue(channelName);
+        boolean succeed = this.localMemoryMsgQueue.registerReceiveQueue(channelName);
 
-        if( channel != null || buffer == null){
+        if( channel != null){
             log.warn("The channel already connected!" + channel);
             return channel;
+        }
+        if( !succeed){
+            log.error("Msg queue register error!");
+            return null;
         }
 
         /**
          * do connect logic.
          */
 
-        channel = new IrcChannel(channelName,this,buffer);
+        channel = new IrcChannel(channelName,this);
         this.channels.put(channelName,channel);
         this.channelList.add((channel));
         log.info("加入频道："  + channelName);

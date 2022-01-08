@@ -6,7 +6,6 @@ import zm.irc.client.IrcClient;
 import zm.irc.client.ServerInfo;
 import zm.irc.client.SubscribeInfo;
 import zm.irc.connpool.DbConnectionPool;
-import zm.irc.message.receive.IrcReceiveMessage;
 
 import java.io.*;
 import java.util.HashMap;
@@ -35,37 +34,11 @@ public class RunIrcClientBackEnd {
         dbPwd = args[1];
 
         init(dbUserName,dbPwd);
-        doStart();
+        IrcClient libera = doStart();
 
-    }
-
-
-    private static void init(String dbUserName,String dbPwd){
-        log.info("DB CONN POOL Init...");
-        DbConnectionPool.init(5);
-
-        log.info("DB CONN Self Test...");
-        DbConnectionPool.close(DbConnectionPool.getConnection());
-    }
-
-    private static void doStart() throws IOException {
-
-
-        /**Key host+channel : irc.2600.net#zmtest, value the Subscribes of this channel*/
-        Map<String, SubscribeInfo> subscribeInfoMap = new HashMap();
-
-        SubscribeInfo s = new SubscribeInfo("irc.libera.chat", "#zmtest", null);
-
-        ServerInfo liberaServerInfo = new ServerInfo("irc.libera.chat", IrcClient.DEFAULT_PORT);
-        liberaServerInfo.addChannel("#linuxba");
-        liberaServerInfo.addChannel("#c_lang_cn");
-        liberaServerInfo.addChannel("#zmtest");
-        liberaServerInfo.addChannel("#linux");
-        liberaServerInfo.addChannel("#0dev");
-
-        IrcClient libera = new IrcClient(liberaServerInfo, nick);
-        libera.start();
-
+        /**
+         * Loop all channel and clean their message buffer by print method.
+         */
         while(true){
             try {
                 Thread.sleep(50);
@@ -79,6 +52,38 @@ public class RunIrcClientBackEnd {
                 e.printStackTrace();
             }
         }
+
+    }
+
+
+    private static void init(String dbUserName,String dbPwd){
+        log.info("DB CONN POOL Init...");
+        DbConnectionPool.init(5);
+
+        log.info("DB CONN Self Test...");
+        DbConnectionPool.close(DbConnectionPool.getConnection());
+    }
+
+    private static IrcClient doStart() throws IOException {
+
+
+        /**Key host+channel : irc.2600.net#zmtest, value the Subscribes of this channel*/
+        Map<String, SubscribeInfo> subscribeInfoMap = new HashMap();
+
+        SubscribeInfo s = new SubscribeInfo("irc.libera.chat", "#zmtest", null);
+
+        ServerInfo liberaServerInfo = new ServerInfo("irc.libera.chat", IrcClient.DEFAULT_PORT);
+      //  liberaServerInfo.addChannel("#linuxba");
+      //  liberaServerInfo.addChannel("#c_lang_cn");
+        liberaServerInfo.addChannel("#zmtest");
+       // liberaServerInfo.addChannel("#linux");
+        liberaServerInfo.addChannel("#0dev");
+
+        IrcClient libera = new IrcClient(liberaServerInfo, nick);
+        libera.start();
+
+        return libera;
+
 
 
 

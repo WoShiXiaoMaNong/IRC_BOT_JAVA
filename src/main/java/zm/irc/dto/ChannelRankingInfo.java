@@ -56,4 +56,11 @@ public class ChannelRankingInfo {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return String.format("%-15s(Messages:%d)   [%s - %s]",channel,msgCount,startAt.format(dtf),endAt.format(dtf));
     }
+
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        System.out.println(now.format(dtf));
+    }
 }

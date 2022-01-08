@@ -1,6 +1,7 @@
 package zm.irc.msgqueue;
 
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import zm.irc.message.receive.IrcReceiveMessage;
 import zm.irc.message.send.IrcSendMessage;
@@ -29,14 +30,14 @@ public class LocalMemoryMsgQueue {
         this.receiveQueues = new ConcurrentHashMap<>();
     }
 
-    public ConcurrentLinkedQueue<IrcReceiveMessage> registerReceiveQueue(String queueName){
+    public boolean registerReceiveQueue(String queueName){
         if(this.receiveQueues.containsKey(queueName)){
             log.error("Queue Name exist!" + queueName);
-            return null;
+            return false;
         }
         ConcurrentLinkedQueue<IrcReceiveMessage> queue = new ConcurrentLinkedQueue<>();
         this.receiveQueues.put(queueName,queue);
-        return queue;
+        return true;
     }
 
 
@@ -61,6 +62,14 @@ public class LocalMemoryMsgQueue {
             return null;
         }
         return this.systemReceiveQueue.poll();
+    }
+
+    public IrcReceiveMessage getMsgFromBuffer(String channelName){
+        ConcurrentLinkedQueue<IrcReceiveMessage> buffer = this.receiveQueues.get(channelName);
+        if(CollectionUtils.isEmpty(buffer)){
+            return null;
+        }
+        return buffer.poll();
     }
 
     public void addSendQueue(IrcSendMessage msg){

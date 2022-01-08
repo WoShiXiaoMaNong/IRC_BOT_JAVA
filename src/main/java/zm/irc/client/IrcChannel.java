@@ -2,19 +2,19 @@ package zm.irc.client;
 
 import zm.irc.message.receive.IrcReceiveMessage;
 import zm.irc.message.send.IrcSendMessage;
+import zm.irc.msgqueue.LocalMemoryMsgQueue;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+
 
 public class IrcChannel {
 
     private String channelName;
     private IrcClient client;
-    private ConcurrentLinkedQueue<IrcReceiveMessage> receiveBuffer;
+    private LocalMemoryMsgQueue localMemoryMsgQueue = LocalMemoryMsgQueue.localMemoryMsgQueue;
 
-    public IrcChannel(String channelName, IrcClient client, ConcurrentLinkedQueue<IrcReceiveMessage> receiveBuffer){
+    public IrcChannel(String channelName, IrcClient client){
         this.channelName = channelName;
         this.client = client;
-        this.receiveBuffer = receiveBuffer;
     }
 
 
@@ -34,10 +34,8 @@ public class IrcChannel {
     }
 
     public IrcReceiveMessage receiveMsg(){
-        if(this.receiveBuffer.isEmpty()){
-            return null;
-        }
-        return this.receiveBuffer.poll();
+
+        return this.localMemoryMsgQueue.getMsgFromBuffer(this.channelName);
     }
 
 }
