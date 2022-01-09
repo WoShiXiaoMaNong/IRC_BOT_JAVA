@@ -15,6 +15,9 @@ public interface IrcSendMessage {
         if( msgStr.toUpperCase(Locale.ROOT).startsWith(IrcCommand.JOIN)){
             msg = new IrcJoinMessage();
             ((IrcJoinMessage)msg).setChannel(msgStr.split(" ")[1]);
+        }else if( msgStr.toUpperCase(Locale.ROOT).startsWith(IrcCommand.PART)){
+            msg = new IrcPartMessage();
+            ((IrcPartMessage)msg).setChannel(channel);
         }else{
             msg = new IrcChatMessage();
             ((IrcChatMessage)msg).setMsg(msgStr);

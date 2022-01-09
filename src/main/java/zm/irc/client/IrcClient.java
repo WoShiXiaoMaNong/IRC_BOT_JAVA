@@ -15,10 +15,7 @@ import zm.irc.threads.RecvMsgProcessThread;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class IrcClient {
@@ -30,7 +27,7 @@ public class IrcClient {
      * value : channel
      */
     private Map<String,IrcChannel> channels;
-    private List<IrcChannel> channelList;
+    private LinkedList<IrcChannel> channelList;
 
     private volatile IrcChannel currentChannel;
     private int currentChannelIndex; // For internal Use only;
@@ -43,7 +40,7 @@ public class IrcClient {
 
     public IrcClient(ServerInfo serverInfo, String nick){
         this.channels = new HashMap<>();
-        this.channelList = new ArrayList<>();
+        this.channelList = new LinkedList<>();
         this.currentChannelIndex = 0;
         this.serverInfo = serverInfo;
         this.nick = nick;
@@ -161,6 +158,25 @@ public class IrcClient {
 
         this.currentChannel = channel;
         return this.currentChannel;
+    }
+
+
+    public void part(String channelName){
+        IrcChannel channel = this.channels.remove(channelName);
+
+        if( channel == null){
+            log.warn("The channel already connected!" + channel);
+            return ;
+        }
+
+        for(Iterator<IrcChannel> it = this.channelList.iterator();it.hasNext();){
+           IrcChannel c = it.next();
+           if(channelName.equals(c.getChannelName())){
+               it.remove();
+           }
+        }
+        this.localMemoryMsgQueue.removeReceiveQueue(channelName);
+        channel.part();
     }
 
 
