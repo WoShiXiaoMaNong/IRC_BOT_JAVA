@@ -8,4 +8,7 @@ public class CommandNameConst {
     public static final String CMD_JOIN = "Join";
 
     public static final String CMD_PART = "Part";
+
+    public static final String CMD_LIST_JOINED = "ListChannel";
+
 }

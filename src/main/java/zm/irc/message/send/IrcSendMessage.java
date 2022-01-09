@@ -21,11 +21,6 @@ public interface IrcSendMessage {
             ((IrcChatMessage)msg).setChannel(channel);
         }
 
-
-
-
-
-
         return msg;
     }
 

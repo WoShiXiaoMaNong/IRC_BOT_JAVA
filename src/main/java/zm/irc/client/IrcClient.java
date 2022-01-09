@@ -25,6 +25,10 @@ public class IrcClient {
     private static final Logger log = Logger.getLogger(IrcClient.class);
     public static final int DEFAULT_PORT = 6667;
 
+    /**
+     * key : channel  name
+     * value : channel
+     */
     private Map<String,IrcChannel> channels;
     private List<IrcChannel> channelList;
 
@@ -62,6 +66,10 @@ public class IrcClient {
         }
     }
 
+    /**
+     * key : channel  name
+     * value : channel
+     */
     public Map<String,IrcChannel> getAllChannel(){
         return this.channels;
     }

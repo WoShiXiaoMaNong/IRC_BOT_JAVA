@@ -31,23 +31,15 @@ public class CmdTop10 implements IrcChatMsgCmd{
         if(CollectionUtils.isNotEmpty(top10)){
             /** Sort */
             top10.sort(Comparator.comparingInt(ChannelRankingInfo::getMsgCount).reversed());
-
-
-
-
            for(int i = 0 ; i < top10.size();i++){
                ChannelRankingInfo top = top10.get(i);
-               String msgBody = String.format("Top %d : %s",i + 1, top.getTopMsg());
+               String msgBody = String.format(" >> %s : Top %d : %s",cmd.getFromName(),i + 1, top.getTopMsg());
                IrcChatMessage msg = new IrcChatMessage();
                msg.setChannel(cmd.getChannel());
                msg.setMsg(msgBody);
                this.localMemoryMsgQueue.addSendQueue(msg);
             }
-
-
-
         }
-
         return true;
     }
 }

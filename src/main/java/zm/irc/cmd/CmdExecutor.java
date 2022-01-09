@@ -27,6 +27,8 @@ public class CmdExecutor {
             ircChatMsgCmd = new CmdJoin();
         }else if(CommandNameConst.CMD_PART.equals(cmdName)){
             ircChatMsgCmd = new CmdPart();
+        }else if(CommandNameConst.CMD_LIST_JOINED.equals(cmdName)){
+            ircChatMsgCmd = new CmdListJoinedChannels();
         }
 
         if(ircChatMsgCmd != null){
