@@ -28,7 +28,7 @@ public class CmdPart implements IrcChatMsgCmd{
             log.warn("Param empty!");
             return true;
         }
-        this.doJoinChannel(cmd,params);
+        this.doPartChannel(cmd,params);
         return true;
     }
 
@@ -40,7 +40,7 @@ public class CmdPart implements IrcChatMsgCmd{
      * @param cmd
      * @param channelNames
      */
-    private void doJoinChannel(IrcReceiveCmdMessage cmd,Object[] channelNames){
+    private void doPartChannel(IrcReceiveCmdMessage cmd,Object[] channelNames){
         if(channelNames == null){
             return;
         }
