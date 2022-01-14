@@ -1,15 +1,11 @@
 package zm.irc;
 
 import org.apache.log4j.Logger;
-import zm.irc.client.IrcChannel;
 import zm.irc.client.IrcClient;
 import zm.irc.client.ServerInfo;
-import zm.irc.client.SubscribeInfo;
 import zm.irc.connpool.DbConnectionPool;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class RunIrcClientBackEnd {
     private static final Logger log = Logger.getLogger(RunIrcClientBackEnd.class);
@@ -61,13 +57,6 @@ public class RunIrcClientBackEnd {
     }
 
     private static IrcClient initClient() throws IOException {
-
-
-        /**Key host+channel : irc.2600.net#zmtest, value the Subscribes of this channel*/
-        Map<String, SubscribeInfo> subscribeInfoMap = new HashMap();
-
-        SubscribeInfo s = new SubscribeInfo("irc.libera.chat", "#zmtest", null);
-
         ServerInfo liberaServerInfo = new ServerInfo("irc.libera.chat", IrcClient.DEFAULT_PORT);
         liberaServerInfo.addChannel("#linuxba");
         liberaServerInfo.addChannel("#c_lang_cn");
