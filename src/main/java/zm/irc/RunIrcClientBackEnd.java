@@ -1,15 +1,12 @@
 package zm.irc;
 
 import org.apache.log4j.Logger;
-import zm.irc.client.IrcChannel;
 import zm.irc.client.IrcClient;
 import zm.irc.client.ServerInfo;
-import zm.irc.client.SubscribeInfo;
 import zm.irc.connpool.DbConnectionPool;
+import zm.irc.dao.BaiduTransDao;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class RunIrcClientBackEnd {
     private static final Logger log = Logger.getLogger(RunIrcClientBackEnd.class);
@@ -19,7 +16,7 @@ public class RunIrcClientBackEnd {
 
     /**
      * Startup : java -jar ./target/{Jar file name}.jar {db username} {db pwd}
-     * Startup backend : nohup java -jar ./target/{Jar file name}.jar {db username} {db pwd} >> ./console.log 2>&1 &
+     * Startup backend : nohup java -jar ./target/{Jar file name}.jar {db username} {db pwd} {baidu api appid} {baidu api secretKey} >> ./console.log 2>&1 &
      * @param args
      * @throws IOException
      * @throws InterruptedException
@@ -27,12 +24,14 @@ public class RunIrcClientBackEnd {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        if(args == null || args.length !=2 ){
+        if(args == null || args.length !=4 ){
             throw new RuntimeException("Invalid args!" + args);
         }
         dbUserName = args[0];
         dbPwd = args[1];
-
+        String appId = args[2];
+        String secretKey = args[3];
+        BaiduTransDao.init(appId,secretKey);
         init(dbUserName,dbPwd);
         IrcClient libera = initClient();
 
@@ -61,19 +60,12 @@ public class RunIrcClientBackEnd {
     }
 
     private static IrcClient initClient() throws IOException {
-
-
-        /**Key host+channel : irc.2600.net#zmtest, value the Subscribes of this channel*/
-        Map<String, SubscribeInfo> subscribeInfoMap = new HashMap();
-
-        SubscribeInfo s = new SubscribeInfo("irc.libera.chat", "#zmtest", null);
-
         ServerInfo liberaServerInfo = new ServerInfo("irc.libera.chat", IrcClient.DEFAULT_PORT);
-        liberaServerInfo.addChannel("#linuxba");
+        liberaServerInfo.addChannel("#zlang");
         liberaServerInfo.addChannel("#c_lang_cn");
-        liberaServerInfo.addChannel("#zmtest");
-     //   liberaServerInfo.addChannel("#linux");
-        liberaServerInfo.addChannel("#0dev");
+       //liberaServerInfo.addChannel("#zmtest");
+       liberaServerInfo.addChannel("#linux");
+       liberaServerInfo.addChannel("#0dev");
 
         IrcClient libera = new IrcClient(liberaServerInfo, nick);
         libera.start();

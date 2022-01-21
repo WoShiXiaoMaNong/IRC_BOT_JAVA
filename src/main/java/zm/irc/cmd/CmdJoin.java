@@ -28,7 +28,7 @@ public class CmdJoin implements IrcChatMsgCmd{
             log.warn("Param empty!");
             return true;
         }
-        this.doJoinChannel(cmd,params);
+        this.doJoinChannel(cmd,params, client);
         return true;
     }
 
@@ -40,7 +40,7 @@ public class CmdJoin implements IrcChatMsgCmd{
      * @param cmd
      * @param channelNames
      */
-    private void doJoinChannel(IrcReceiveCmdMessage cmd,Object[] channelNames){
+    private void doJoinChannel(IrcReceiveCmdMessage cmd,Object[] channelNames, IrcClient client){
         if(channelNames == null){
             return;
         }
@@ -51,9 +51,7 @@ public class CmdJoin implements IrcChatMsgCmd{
             if( ! (channelName instanceof String)){
                 continue;
             }
-            IrcJoinMessage msg = new IrcJoinMessage();
-            msg.setChannel((String) channelName);
-            cmd.getIrcClient().sendMessage(msg);
+            client.join((String) channelName);
         }
     }
 }

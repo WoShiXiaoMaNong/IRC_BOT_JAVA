@@ -2,6 +2,7 @@
 
 #### Description
 This is a IRC Chat room BOT. Is created by KKK. I'm coding it just for fun. ( _**The less use third-party jar, the better**_ ）
+<br><a href='https://datatracker.ietf.org/doc/rfc1459/'>  **_IRC Protocal Doc_**  </a>
 
 #### Software Architecture
 Software architecture description

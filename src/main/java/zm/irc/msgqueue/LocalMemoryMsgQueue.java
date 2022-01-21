@@ -40,6 +40,10 @@ public class LocalMemoryMsgQueue {
         return true;
     }
 
+    public void removeReceiveQueue(String queueName){
+        this.receiveQueues.remove(queueName);
+    }
+
 
     public void receiveMsg(String channelName,IrcReceiveMessage recvMsg){
         if(channelName == null){

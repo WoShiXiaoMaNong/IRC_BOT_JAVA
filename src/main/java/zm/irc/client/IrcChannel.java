@@ -1,5 +1,6 @@
 package zm.irc.client;
 
+import zm.irc.consts.IrcCommand;
 import zm.irc.message.receive.IrcReceiveMessage;
 import zm.irc.message.send.IrcSendMessage;
 import zm.irc.msgqueue.LocalMemoryMsgQueue;
@@ -38,4 +39,8 @@ public class IrcChannel {
         return this.localMemoryMsgQueue.getMsgFromBuffer(this.channelName);
     }
 
+
+    public void part(){
+        this.send(IrcCommand.PART);
+    }
 }
