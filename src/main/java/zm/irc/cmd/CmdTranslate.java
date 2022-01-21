@@ -53,10 +53,11 @@ public class CmdTranslate implements IrcChatMsgCmd{
      */
     private void doTrans(IrcReceiveCmdMessage cmd,String distLanguage, String msg, IrcClient client){
         String dist = dao.transTo(msg,distLanguage);
-      //  String dist = dao.zhToEn(msg);
+
         IrcChatMessage chatMsg = new IrcChatMessage();
         chatMsg.setChannel(cmd.getChannel());
-        chatMsg.setMsg(dist);
+        String msgBody = String.format(" >> %s : %s",cmd.getFromName(),dist);
+        chatMsg.setMsg(msgBody);
         this.localMemoryMsgQueue.addSendQueue(chatMsg);
 
     }
