@@ -40,7 +40,7 @@ public class CmdTranslate implements IrcChatMsgCmd{
             targetMsg.append(" ").append(params[i]);
         }
 
-        this.doTrans(cmd,params[0],targetMsg.toString(), client);
+        this.doTrans(cmd,params[0],targetMsg.toString().trim(), client);
         return true;
     }
 
@@ -53,6 +53,7 @@ public class CmdTranslate implements IrcChatMsgCmd{
      */
     private void doTrans(IrcReceiveCmdMessage cmd,String distLanguage, String msg, IrcClient client){
         String dist = dao.transTo(msg,distLanguage);
+      //  String dist = dao.zhToEn(msg);
         IrcChatMessage chatMsg = new IrcChatMessage();
         chatMsg.setChannel(cmd.getChannel());
         chatMsg.setMsg(dist);
