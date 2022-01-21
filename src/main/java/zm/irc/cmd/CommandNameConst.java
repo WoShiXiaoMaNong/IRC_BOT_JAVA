@@ -11,4 +11,6 @@ public class CommandNameConst {
 
     public static final String CMD_LIST_JOINED = "ListChannel";
 
+    public static final String CMD_TRANSLATE = "Tr";
+
 }

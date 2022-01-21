@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import zm.irc.client.IrcClient;
 import zm.irc.client.ServerInfo;
 import zm.irc.connpool.DbConnectionPool;
+import zm.irc.dao.BaiduTransDao;
 
 import java.io.*;
 
@@ -15,7 +16,7 @@ public class RunIrcClientBackEnd {
 
     /**
      * Startup : java -jar ./target/{Jar file name}.jar {db username} {db pwd}
-     * Startup backend : nohup java -jar ./target/{Jar file name}.jar {db username} {db pwd} >> ./console.log 2>&1 &
+     * Startup backend : nohup java -jar ./target/{Jar file name}.jar {db username} {db pwd} {baidu api appid} {baidu api secretKey} >> ./console.log 2>&1 &
      * @param args
      * @throws IOException
      * @throws InterruptedException
@@ -23,12 +24,14 @@ public class RunIrcClientBackEnd {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        if(args == null || args.length !=2 ){
+        if(args == null || args.length !=4 ){
             throw new RuntimeException("Invalid args!" + args);
         }
         dbUserName = args[0];
         dbPwd = args[1];
-
+        String appId = args[2];
+        String secretKey = args[3];
+        BaiduTransDao.init(appId,secretKey);
         init(dbUserName,dbPwd);
         IrcClient libera = initClient();
 

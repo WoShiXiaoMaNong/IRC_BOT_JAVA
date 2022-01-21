@@ -29,7 +29,11 @@ public class CmdExecutor {
             ircChatMsgCmd = new CmdPart();
         }else if(CommandNameConst.CMD_LIST_JOINED.equals(cmdName)){
             ircChatMsgCmd = new CmdListJoinedChannels();
+        }else if(CommandNameConst.CMD_TRANSLATE.equals(cmdName)){
+            ircChatMsgCmd = new CmdTranslate();
         }
+
+
 
         if(ircChatMsgCmd != null){
             return ircChatMsgCmd.execute(cmd,client);
