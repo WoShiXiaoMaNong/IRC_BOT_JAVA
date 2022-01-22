@@ -34,9 +34,13 @@ public class TranslateThread implements Runnable{
                     String msgBody = String.format(" >> %s : %s",translateInfo.getRequesterName(),dist);
                     chatMsg.setMsg(msgBody);
                     this.localMemoryMsgQueue.addSendQueue(chatMsg);
+                    Thread.sleep(1200);//Due to the translate api's QRS is only 1.
+                }else{
+                    Thread.sleep(50);//Due to the translate api's QRS is only 1.
                 }
-                msg =  localMemoryMsgQueue.getMsgFromSendQueue();
-                Thread.sleep(1200);//Due to the translate api's QRS is only 1.
+        
+                msg =  localMemoryMsgQueue.getMsgFromCommonQueue(queueName);
+               
             }catch (Exception e){
                 log.error("error",e);
             }
