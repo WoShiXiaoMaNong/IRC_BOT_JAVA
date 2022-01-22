@@ -4,11 +4,12 @@ package zm.irc.cmd;
 import org.apache.log4j.Logger;
 import zm.irc.client.IrcClient;
 import zm.irc.dao.BaiduTransDao;
+import zm.irc.dto.TranslateInfo;
 import zm.irc.message.receive.IrcReceiveCmdMessage;
 import zm.irc.message.send.IrcChatMessage;
 import zm.irc.message.send.IrcJoinMessage;
 import zm.irc.msgqueue.LocalMemoryMsgQueue;
-import zm.irc.service.MsgSummaryInfoService;
+import zm.irc.threads.TranslateThread;
 
 /**
  * <pre>
@@ -19,7 +20,7 @@ import zm.irc.service.MsgSummaryInfoService;
  */
 public class CmdTranslate implements IrcChatMsgCmd{
     private static final Logger log = Logger.getLogger(CmdTranslate.class);
-    private static BaiduTransDao dao = new BaiduTransDao();
+    private static BaiduTransDao dao = BaiduTransDao.dao;
 
     private LocalMemoryMsgQueue localMemoryMsgQueue;
 
@@ -52,13 +53,14 @@ public class CmdTranslate implements IrcChatMsgCmd{
      * @param cmd
      */
     private void doTrans(IrcReceiveCmdMessage cmd,String distLanguage, String msg, IrcClient client){
-        String dist = dao.transTo(msg,distLanguage);
+        TranslateInfo translateInfo = new TranslateInfo();
+        translateInfo.setChannelName(cmd.getChannel());
+        translateInfo.setDistLanguage(distLanguage);
+        translateInfo.setMsg(msg);
+        translateInfo.setRequesterName(cmd.getFromName());
 
-        IrcChatMessage chatMsg = new IrcChatMessage();
-        chatMsg.setChannel(cmd.getChannel());
-        String msgBody = String.format(" >> %s : %s",cmd.getFromName(),dist);
-        chatMsg.setMsg(msgBody);
-        this.localMemoryMsgQueue.addSendQueue(chatMsg);
+        this.localMemoryMsgQueue.addIntoCommonQueue(TranslateThread.queueName, translateInfo);
+     
 
     }
 }

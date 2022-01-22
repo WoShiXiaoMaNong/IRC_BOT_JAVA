@@ -16,6 +16,8 @@ public class BaiduTransDao {
     private static String secretKey = "";
     private static String baseUrl = "http://api.fanyi.baidu.com/api/trans/vip/translate?";
 
+    public static BaiduTransDao dao = new BaiduTransDao();
+    private BaiduTransDao(){}
 
     public static void init(String appId,String secretKey){
         BaiduTransDao.appId = appId;
