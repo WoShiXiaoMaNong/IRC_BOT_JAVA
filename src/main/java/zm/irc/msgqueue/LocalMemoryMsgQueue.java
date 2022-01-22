@@ -20,7 +20,9 @@ public class LocalMemoryMsgQueue {
 
 
 
-    private ConcurrentHashMap<String, ConcurrentLinkedQueue> receiveQueues;
+    private ConcurrentHashMap<String, ConcurrentLinkedQueue<IrcReceiveMessage>> receiveQueues;
+
+    private ConcurrentHashMap<String, ConcurrentLinkedQueue<Object>> commonQueues;
 
     private ConcurrentLinkedQueue<IrcReceiveMessage> systemReceiveQueue;
 
@@ -28,6 +30,17 @@ public class LocalMemoryMsgQueue {
         this.sendQueue = new ConcurrentLinkedQueue<>();
         this.systemReceiveQueue = new ConcurrentLinkedQueue<>();
         this.receiveQueues = new ConcurrentHashMap<>();
+        this.commonQueues = new ConcurrentHashMap<>();
+    }
+
+    public synchronized boolean  registerCommonQueue(String queueName){
+        if(this.commonQueues.containsKey(queueName)){
+            log.error("Queue Name exist!" + queueName);
+            return false;
+        }
+        ConcurrentLinkedQueue<Object> queue = new ConcurrentLinkedQueue<>();
+        this.commonQueues.put(queueName,queue);
+        return true;
     }
 
     public synchronized boolean  registerReceiveQueue(String queueName){
@@ -61,6 +74,20 @@ public class LocalMemoryMsgQueue {
 
     }
 
+    public void addIntoCommonQueue(String queueName,Object msg){
+        if(queueName == null){
+            log.debug("Queue name must be not null.");
+            return;
+        }
+        ConcurrentLinkedQueue<Object> commonQueue = this.commonQueues.get(queueName);
+        if(commonQueue == null){
+            log.debug("There is no common queue named :" + queueName + " . The message was be dropped.");
+        }else{
+            commonQueue.add(msg);
+        }
+
+    }
+
     public IrcReceiveMessage getSystemMsg(){
         if(this.systemReceiveQueue.isEmpty()){
             return null;
@@ -75,6 +102,15 @@ public class LocalMemoryMsgQueue {
         }
         return buffer.poll();
     }
+
+    public Object getMsgFromCommonQueue(String channelName){
+        ConcurrentLinkedQueue<Object> buffer = this.commonQueues.get(channelName);
+        if(CollectionUtils.isEmpty(buffer)){
+            return null;
+        }
+        return buffer.poll();
+    }
+
 
     public void addSendQueue(IrcSendMessage msg){
         if(msg == null){

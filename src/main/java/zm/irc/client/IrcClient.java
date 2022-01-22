@@ -12,6 +12,7 @@ import zm.irc.threads.CommandLineInputThread;
 import zm.irc.threads.MsgSendThread;
 import zm.irc.threads.RecvMsgCollectThread;
 import zm.irc.threads.RecvMsgProcessThread;
+import zm.irc.threads.TranslateThread;
 
 import java.io.*;
 import java.net.Socket;
@@ -101,6 +102,9 @@ public class IrcClient {
 
         log.info("Prepare Command-Line Input Thread！");
         new Thread(new CommandLineInputThread(this)).start();
+
+        log.info("Prepare Translate Thread！");
+        new Thread(new TranslateThread()).start();
 
 
 
