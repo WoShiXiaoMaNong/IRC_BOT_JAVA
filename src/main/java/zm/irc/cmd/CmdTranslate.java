@@ -3,10 +3,8 @@ package zm.irc.cmd;
 
 import org.apache.log4j.Logger;
 import zm.irc.client.IrcClient;
-import zm.irc.dao.BaiduTransDao;
 import zm.irc.dto.TranslateInfo;
 import zm.irc.message.receive.IrcReceiveCmdMessage;
-import zm.irc.message.send.IrcChatMessage;
 import zm.irc.message.send.IrcJoinMessage;
 import zm.irc.msgqueue.LocalMemoryMsgQueue;
 import zm.irc.threads.TranslateThread;
@@ -20,7 +18,6 @@ import zm.irc.threads.TranslateThread;
  */
 public class CmdTranslate implements IrcChatMsgCmd{
     private static final Logger log = Logger.getLogger(CmdTranslate.class);
-    private static BaiduTransDao dao = BaiduTransDao.dao;
 
     private LocalMemoryMsgQueue localMemoryMsgQueue;
 

@@ -32,7 +32,6 @@ public class CmdListJoinedChannels implements IrcChatMsgCmd{
      */
     @Override
     public boolean execute(IrcReceiveCmdMessage cmd, IrcClient client) {
-        String[]  params = cmd.getCmdParams();
 
         Map<String,IrcChannel> allChannels = client.getAllChannel();
         if(allChannels == null || allChannels.isEmpty()){

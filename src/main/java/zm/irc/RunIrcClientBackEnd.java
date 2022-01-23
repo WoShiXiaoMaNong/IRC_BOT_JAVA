@@ -12,7 +12,7 @@ public class RunIrcClientBackEnd {
     private static final Logger log = Logger.getLogger(RunIrcClientBackEnd.class);
     public static String dbUserName="";
     public static String dbPwd="";
-    public static String nick = "bfd_bot";
+    public static String nick = "bfd_bot1";
 
     /**
      * Startup : java -jar ./target/{Jar file name}.jar {db username} {db pwd}
@@ -62,10 +62,10 @@ public class RunIrcClientBackEnd {
     private static IrcClient initClient() throws IOException {
         ServerInfo liberaServerInfo = new ServerInfo("irc.libera.chat", IrcClient.DEFAULT_PORT);
         liberaServerInfo.addChannel("#zlang");
-        liberaServerInfo.addChannel("#c_lang_cn");
-        liberaServerInfo.addChannel("#zmtest");
-        liberaServerInfo.addChannel("#linux");
-        liberaServerInfo.addChannel("#0dev");
+        // liberaServerInfo.addChannel("#c_lang_cn");
+        // liberaServerInfo.addChannel("#zmtest");
+        // liberaServerInfo.addChannel("#linux");
+        // liberaServerInfo.addChannel("#0dev");
 
         IrcClient libera = new IrcClient(liberaServerInfo, nick);
         libera.start();
