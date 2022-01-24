@@ -5,14 +5,9 @@ import zm.irc.client.IrcChannel;
 import zm.irc.client.IrcClient;
 import zm.irc.message.processor.MessageProcessorCenter;
 import zm.irc.message.receive.IrcReceiveMessage;
-import zm.irc.msgqueue.LocalMemoryMsgQueue;
-
-
 
 public class RecvMsgProcessThread implements Runnable{
     private static Logger log = Logger.getLogger(RecvMsgProcessThread.class);
-
-    private LocalMemoryMsgQueue localMemoryMsgQueue = LocalMemoryMsgQueue.localMemoryMsgQueue;
     private IrcClient ircClient;
 
     private MessageProcessorCenter msgProcessorCenter;

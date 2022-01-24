@@ -1,7 +1,6 @@
 package zm.irc.threads;
 
 import org.apache.log4j.Logger;
-import zm.irc.client.IrcClient;
 import zm.irc.message.send.IrcSendMessage;
 import zm.irc.msgqueue.LocalMemoryMsgQueue;
 

@@ -3,7 +3,6 @@ package zm.irc.cmd;
 import org.apache.log4j.Logger;
 import zm.irc.client.IrcClient;
 import zm.irc.message.receive.IrcReceiveCmdMessage;
-import zm.irc.message.send.IrcJoinMessage;
 import zm.irc.message.send.IrcPartMessage;
 
 /**

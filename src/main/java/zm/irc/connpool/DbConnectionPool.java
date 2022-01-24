@@ -78,7 +78,7 @@ public class DbConnectionPool {
 
     private static void closeConnDirect(Connection conn){
         try {
-            if (conn != null || !conn.isClosed()) {
+            if (conn != null && !conn.isClosed()) {
                 conn.close();
             }
         }catch(Exception e){

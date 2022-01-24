@@ -3,8 +3,6 @@ package zm.irc.threads;
 import org.apache.log4j.Logger;
 import zm.irc.client.IrcChannel;
 import zm.irc.client.IrcClient;
-import zm.irc.message.send.IrcSendMessage;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 

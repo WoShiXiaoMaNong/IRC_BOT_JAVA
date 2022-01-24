@@ -25,7 +25,6 @@ public abstract class IrcReceiveMessage {
 
     private String originMsg;
     private IrcClient ircClient;
-    private String channel;
 
     public IrcReceiveMessage(String originMsg,IrcClient ircClient){
         this.originMsg = originMsg;
